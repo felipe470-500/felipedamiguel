@@ -695,21 +695,21 @@ const VehicleCard = memo(function VehicleCard({
               <PlayCircle className="h-10 w-10" />
             </div>
           </div>
-        ) : (
-          <MediaImg
-            src={coverImage}
-            alt={vehicle.name}
-            loading="eager"
-            decoding="async"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            onError={(e) => {
-              const img = e.currentTarget;
-              if (img.dataset.fallback === "1") return;
-              img.dataset.fallback = "1";
-              img.src = FALLBACK_IMAGE;
-            }}
-          />
-        )}
+          <div className="flex h-full w-full items-center justify-center bg-[#15181e]">
+            <MediaImg
+              src={coverImage}
+              alt={vehicle.name}
+              loading="eager"
+              decoding="async"
+              className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+              onError={(e) => {
+                const img = e.currentTarget;
+                if (img.dataset.fallback === "1") return;
+                img.dataset.fallback = "1";
+                img.src = FALLBACK_IMAGE;
+              }}
+            />
+          </div>
 
         {vehicle.tag && (
           <span className="absolute left-3 top-3 rounded-full bg-[image:var(--gradient-accent)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-primary-foreground z-10">
