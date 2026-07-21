@@ -77,6 +77,7 @@ export function SellerPickerDialog({
                     <img
                       src={profiles[s.id]!}
                       alt={s.name}
+                      loading="lazy"
                       className="h-9 w-9 rounded-full object-cover border border-border bg-muted"
                     />
                   ) : (

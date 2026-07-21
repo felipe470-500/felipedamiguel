@@ -107,31 +107,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: logoUrl,
       },
     ],
-    scripts: [
-      {
-        children: `
-!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
-document,'script','https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '${META_PIXEL_ID}');
-fbq('track', 'PageView');
-`,
-      },
-      {
-        src: `https://www.googletagmanager.com/gtag/js?id=${GOOGLE_TAG_ID}`,
-        async: true,
-      },
-      {
-        children: `
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', '${GOOGLE_TAG_ID}');
-`,
-      },
-    ],
+    scripts: [],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -153,8 +129,68 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+import { useEffect } from "react";
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const initAnalytics = () => {
+      // 1. Facebook Pixel
+      if (!(window as any).fbq) {
+        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+        n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+        document,'script','https://connect.facebook.net/en_US/fbevents.js');
+        (window as any).fbq('init', META_PIXEL_ID);
+        (window as any).fbq('track', 'PageView');
+      }
+
+      // 2. Google Analytics (GA4)
+      if (!(window as any).gtag) {
+        const script = document.createElement("script");
+        script.src = `https://www.googletagmanager.com/gtag/js?id=${GOOGLE_TAG_ID}`;
+        script.async = true;
+        document.head.appendChild(script);
+
+        (window as any).dataLayer = (window as any).dataLayer || [];
+        (window as any).gtag = function() {
+          (window as any).dataLayer.push(arguments);
+        };
+        (window as any).gtag('js', new Date());
+        (window as any).gtag('config', GOOGLE_TAG_ID);
+      }
+    };
+
+    let loaded = false;
+    const triggerLoad = () => {
+      if (loaded) return;
+      loaded = true;
+      initAnalytics();
+      cleanup();
+    };
+
+    const cleanup = () => {
+      window.removeEventListener("scroll", triggerLoad);
+      window.removeEventListener("touchstart", triggerLoad);
+      window.removeEventListener("mousemove", triggerLoad);
+    };
+
+    // Carrega automaticamente após 2.5s caso não haja interação antes
+    const timeoutId = setTimeout(triggerLoad, 2500);
+
+    window.addEventListener("scroll", triggerLoad, { passive: true });
+    window.addEventListener("touchstart", triggerLoad, { passive: true });
+    window.addEventListener("mousemove", triggerLoad, { passive: true });
+
+    return () => {
+      clearTimeout(timeoutId);
+      cleanup();
+    };
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
