@@ -161,8 +161,8 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
                         alt={`${vehicle.name} - Foto ${i + 1}`}
                         loading={i === 0 ? "eager" : "lazy"}
                         decoding="async"
-                        className="w-full h-full object-contain block cursor-pointer"
-                        style={{ objectFit: "contain", width: "100%", height: "100%" }}
+                        className="max-h-full max-w-full block cursor-pointer object-contain"
+                        style={{ objectFit: "contain" }}
                         onClick={(e) => {
                           e.stopPropagation();
                           setLightboxOpen(true);
