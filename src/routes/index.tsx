@@ -702,7 +702,8 @@ const VehicleCard = memo(function VehicleCard({
               alt={vehicle.name}
               loading="eager"
               decoding="async"
-              className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+              className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+              style={{ objectFit: "contain", width: "100%", height: "100%" }}
               onError={(e) => {
                 const img = e.currentTarget;
                 if (img.dataset.fallback === "1") return;

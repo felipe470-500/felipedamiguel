@@ -138,10 +138,12 @@ export const ImageZoom: React.FC<ImageZoomProps> = ({
       <MediaImg
         src={src}
         alt={alt}
-        className="w-auto h-auto max-w-full max-h-full select-none pointer-events-none block transition-transform duration-75 ease-out"
+        className="w-full h-full object-contain select-none pointer-events-none block transition-transform duration-75 ease-out"
         style={{
           transform: `translate3d(${position.x}px, ${position.y}px, 0) scale(${scale})`,
           objectFit: "contain",
+          width: "100%",
+          height: "100%",
         }}
       />
     </div>
