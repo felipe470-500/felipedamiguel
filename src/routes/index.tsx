@@ -636,108 +636,44 @@ const VehicleCard = memo(function VehicleCard({
   onContact: () => void;
 }) {
   const images = vehicle.images.length > 0 ? vehicle.images : ["data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'/>"];
-  const [idx, setIdx] = useState(0);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
-  const didSwipeRef = useRef(false);
-
-  function scrollToIndex(i: number) {
-    setIdx(i);
-    if (scrollRef.current) {
-      scrollRef.current.scrollTo({
-        left: scrollRef.current.clientWidth * i,
-        behavior: "smooth",
-      });
-    }
-  }
-
-  function handleMediaScroll() {
-    if (!scrollRef.current) return;
-    const { scrollLeft, clientWidth } = scrollRef.current;
-    if (clientWidth === 0) return;
-    const nextIndex = Math.round(scrollLeft / clientWidth);
-    if (nextIndex !== idx) setIdx(nextIndex);
-  }
-
-  function handleTouchStart(e: React.TouchEvent) {
-    const touch = e.touches[0];
-    touchStartRef.current = touch ? { x: touch.clientX, y: touch.clientY } : null;
-    didSwipeRef.current = false;
-  }
-
-  function handleTouchMove(e: React.TouchEvent) {
-    const start = touchStartRef.current;
-    const touch = e.touches[0];
-    if (!start || !touch) return;
-    const dx = Math.abs(touch.clientX - start.x);
-    const dy = Math.abs(touch.clientY - start.y);
-    if (dx > 12 && dx > dy) didSwipeRef.current = true;
-  }
-
-  function handleMediaClick(e: React.MouseEvent) {
-    if (didSwipeRef.current) {
-      e.stopPropagation();
-      didSwipeRef.current = false;
-      return;
-    }
-    onClick();
-  }
+  const coverImage = images[0];
 
   return (
     <article className="group overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-card)] transition-transform hover:-translate-y-1">
-      {/* Container de Rolagem Horizontal */}
-      <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
-        <div
-          ref={scrollRef}
-          onScroll={handleMediaScroll}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-          className="flex h-full w-full overflow-x-auto snap-x snap-mandatory scroll-smooth"
-        >
-          {images.map((src, mediaIndex) => (
-            <div
-              key={`${src}-${mediaIndex}`}
-              onClick={handleMediaClick}
-              className="h-full w-full flex-shrink-0 snap-start snap-always bg-muted cursor-pointer"
-            >
-              {isVideoUrl(src) ? (
-                <div className="relative flex h-full w-full items-center justify-center bg-muted">
-                  <MediaVideo
-                    src={mediaIndex === idx ? src : undefined}
-                    controls
-                    muted
-                    playsInline
-                    preload={mediaIndex === idx ? "metadata" : "none"}
-                    className="h-full w-full object-contain"
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                  {mediaIndex !== idx && (
-                    <div className="absolute inset-0 flex items-center justify-center text-white/80">
-                      <PlayCircle className="h-10 w-10" />
-                    </div>
-                  )}
-                </div>
-              ) : Math.abs(mediaIndex - idx) <= 1 ? (
-                <MediaImg
-                  src={src}
-                  alt={`${vehicle.name} - Foto ${mediaIndex + 1}`}
-                  loading={mediaIndex === 0 ? "eager" : "lazy"}
-                  decoding="async"
-                  className="h-full w-full object-cover"
-                  onError={(e) => {
-                    const img = e.currentTarget;
-                    if (img.dataset.fallback === "1") return;
-                    img.dataset.fallback = "1";
-                    img.src = FALLBACK_IMAGE;
-                  }}
-                />
-              ) : (
-                <div className="h-full w-full bg-secondary" />
-              )}
+      {/* Container da Foto de Capa (Padrão OLX - Clicar abre a galeria completa) */}
+      <div
+        onClick={onClick}
+        className="relative aspect-[4/3] overflow-hidden bg-muted cursor-pointer"
+      >
+        {isVideoUrl(coverImage) ? (
+          <div className="relative flex h-full w-full items-center justify-center bg-muted">
+            <MediaVideo
+              src={coverImage}
+              controls={false}
+              muted
+              playsInline
+              preload="metadata"
+              className="h-full w-full object-contain"
+            />
+            <div className="absolute inset-0 flex items-center justify-center text-white/80">
+              <PlayCircle className="h-10 w-10" />
             </div>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <MediaImg
+            src={coverImage}
+            alt={vehicle.name}
+            loading="eager"
+            decoding="async"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            onError={(e) => {
+              const img = e.currentTarget;
+              if (img.dataset.fallback === "1") return;
+              img.dataset.fallback = "1";
+              img.src = FALLBACK_IMAGE;
+            }}
+          />
+        )}
 
         {vehicle.tag && (
           <span className="absolute left-3 top-3 rounded-full bg-[image:var(--gradient-accent)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-primary-foreground z-10">
@@ -746,21 +682,9 @@ const VehicleCard = memo(function VehicleCard({
         )}
 
         {images.length > 1 && (
-          <div className="absolute inset-x-0 bottom-2 flex items-center justify-center gap-1.5 z-10">
-            {images.map((_, i) => (
-              <button
-                key={i}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  scrollToIndex(i);
-                }}
-                aria-label={`Mídia ${i + 1}`}
-                className={`h-1.5 rounded-full transition-all ${
-                  i === idx ? "w-5 bg-primary-foreground" : "w-1.5 bg-primary-foreground/50"
-                }`}
-              />
-            ))}
-          </div>
+          <span className="absolute right-3 bottom-3 rounded-full bg-black/70 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-md border border-white/10 z-10">
+            1 / {images.length} fotos
+          </span>
         )}
       </div>
 
