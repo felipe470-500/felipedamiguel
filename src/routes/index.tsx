@@ -42,8 +42,19 @@ export const Route = createFileRoute("/")({
 });
 
 function Landing() {
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [vehicles, setVehicles] = useState<Vehicle[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem("mv:vehicles-cache");
+        if (cached) {
+          const parsed = JSON.parse(cached) as Vehicle[];
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch {}
+    }
+    return [];
+  });
+  const [loading, setLoading] = useState<boolean>(() => vehicles.length === 0);
   const [gateRequired, setGateRequired] = useState(false);
   const [gatePassed, setGatePassed] = useState(true);
   const [picker, setPicker] = useState<{ source: string; message?: string; extraParams?: TrackingParams } | null>(null);
@@ -62,6 +73,7 @@ function Landing() {
   const [profiles, setProfiles] = useState<Record<string, string | null>>({});
 
   useEffect(() => {
+    let alive = true;
     // Hidrata imediatamente com cache local (se houver) para o site abrir em < 50ms.
     if (typeof window !== "undefined") {
       try {
