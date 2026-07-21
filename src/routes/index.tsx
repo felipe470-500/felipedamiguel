@@ -159,6 +159,25 @@ function Landing() {
     };
   }, [listVehicles]);
 
+  // Pré-carregamento contínuo em segundo plano (da 4ª foto em diante)
+  useEffect(() => {
+    if (vehicles.length > 3) {
+      const preloadSequence = async () => {
+        // Aguarda 1.5 segundos para não interferir na banda inicial do site
+        await new Promise((r) => setTimeout(r, 1500));
+        for (let i = 3; i < vehicles.length; i++) {
+          const cover = vehicles[i].images[0];
+          if (!cover) continue;
+          // Download sequencial com 400ms de intervalo para manter a conexão livre
+          await new Promise((r) => setTimeout(r, 400));
+          const img = new Image();
+          img.src = `/api/public/vehicle-image?path=${encodeURIComponent(cover)}`;
+        }
+      };
+      preloadSequence();
+    }
+  }, [vehicles]);
+
 
   useEffect(() => {
     let alive = true;
