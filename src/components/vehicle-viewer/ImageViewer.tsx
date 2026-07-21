@@ -130,7 +130,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
           {/* Área de Conteúdo Rolar (Fica rolável dentro do card) */}
           <div className="flex-1 overflow-y-auto">
             {/* Carrossel de Mídia (Clicável para abrir Tela Inteira) */}
-            <div className="relative aspect-[4/3] md:aspect-[16/10] overflow-hidden bg-black border-b border-border">
+            <div className="relative min-h-[320px] max-h-[60vh] h-[50vh] w-full overflow-hidden bg-black border-b border-border flex items-center justify-center">
               <div
                 ref={scrollRef}
                 onScroll={handleMainScroll}
