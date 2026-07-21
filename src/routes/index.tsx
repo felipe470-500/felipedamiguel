@@ -65,6 +65,7 @@ function Landing() {
   const [selectedBrand, setSelectedBrand] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
   const [maxPrice, setMaxPrice] = useState<number | "">("");
+  const [visibleCount, setVisibleCount] = useState(5);
   const [shareToast, setShareToast] = useState<string | null>(null);
 
   const listVehicles = useServerFn(listVehiclesFn);
@@ -298,6 +299,28 @@ function Landing() {
       return matchesSearch && matchesBrand && matchesYear && matchesPrice;
     });
   }, [vehicles, debouncedSearch, selectedBrand, selectedYear, maxPrice]);
+
+  // Reseta para 5 veículos ao mudar busca/filtros
+  useEffect(() => {
+    setVisibleCount(5);
+  }, [debouncedSearch, selectedBrand, selectedYear, maxPrice]);
+
+  // Rolagem Infinita: carrega de 5 em 5 ao rolar até o fim da página
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    function onScroll() {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 600) {
+        setVisibleCount((prev) => (prev < filteredVehicles.length ? prev + 5 : prev));
+      }
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [filteredVehicles.length]);
+
+  const displayedVehicles = useMemo(
+    () => filteredVehicles.slice(0, visibleCount),
+    [filteredVehicles, visibleCount]
+  );
 
   return (
     <main className="min-h-screen bg-background text-foreground">
@@ -536,23 +559,31 @@ function Landing() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredVehicles.map((v) => (
-              <VehicleCard
-                key={v.id}
-                vehicle={v}
-                onClick={() => openDetail(v)}
-                onContact={() =>
-                  openPicker("vehicle_card", `Olá! Tenho interesse no ${v.name} (${v.year}) — ${v.price}.`, {
-                    vehicle_name: v.name,
-                    vehicle_year: v.year,
-                    vehicle_price: v.price,
-                  })
-                }
-              />
+          <>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {displayedVehicles.map((v) => (
+                <VehicleCard
+                  key={v.id}
+                  vehicle={v}
+                  onClick={() => openDetail(v)}
+                  onContact={() =>
+                    openPicker("vehicle_card", `Olá! Tenho interesse no ${v.name} (${v.year}) — ${v.price}.`, {
+                      vehicle_name: v.name,
+                      vehicle_year: v.year,
+                      vehicle_price: v.price,
+                    })
+                  }
+                />
+              ))}
+            </div>
 
-            ))}
-          </div>
+            {visibleCount < filteredVehicles.length && (
+              <div className="mt-8 flex items-center justify-center gap-2 text-xs font-medium text-muted-foreground">
+                <span className="h-2 w-2 rounded-full bg-primary animate-ping" />
+                Carregando mais veículos...
+              </div>
+            )}
+          </>
         )}
       </section>
 
