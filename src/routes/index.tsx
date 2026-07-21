@@ -324,6 +324,18 @@ function Landing() {
 
   return (
     <main className="min-h-screen bg-background text-foreground">
+      {vehicles.slice(0, 3).map((v) => {
+        const cover = v.images[0];
+        if (!cover) return null;
+        return (
+          <link
+            key={v.id}
+            rel="preload"
+            as="image"
+            href={`/api/public/vehicle-image?path=${encodeURIComponent(cover)}`}
+          />
+        );
+      })}
       {gateRequired && !gatePassed && <LeadGate onDone={() => setGatePassed(true)} />}
 
       {shareToast && (

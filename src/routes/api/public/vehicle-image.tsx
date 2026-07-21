@@ -11,6 +11,40 @@ const IMAGE_SIGNED_TTL = 60 * 60 * 24; // 24h
 const IMAGE_CACHE_MAXAGE = 60 * 60 * 20; // 20h — evita servir 302 com URL prestes a expirar
 const VIDEO_SIGNED_TTL = 60 * 60; // 1h por request (proxy revalida)
 
+// Cache em memória para assinar as URLs de forma estável (evita que a URL mude a cada fragmento/range de áudio/vídeo)
+const urlCache = new Map<string, { url: string; expires: number }>();
+
+async function getSignedUrlCached(
+  supabaseAdmin: any,
+  safePath: string,
+  ttl: number,
+  transform?: any
+): Promise<string> {
+  const cacheKey = `${safePath}:${JSON.stringify(transform || {})}`;
+  const cached = urlCache.get(cacheKey);
+  const now = Date.now();
+
+  // Se já tiver em cache e faltar mais de 10 minutos para expirar, retorna ela
+  if (cached && cached.expires > now + 10 * 60 * 1000) {
+    return cached.url;
+  }
+
+  const { data, error } = await supabaseAdmin.storage
+    .from("vehicle-images")
+    .createSignedUrl(safePath, ttl, transform ? { transform } : undefined);
+
+  if (error || !data?.signedUrl) {
+    throw new Error("Failed to sign URL: " + (error?.message || "Not found"));
+  }
+
+  urlCache.set(cacheKey, {
+    url: data.signedUrl,
+    expires: now + ttl * 1000,
+  });
+
+  return data.signedUrl;
+}
+
 export const Route = createFileRoute("/api/public/vehicle-image")({
   server: {
     handlers: {
@@ -23,21 +57,24 @@ export const Route = createFileRoute("/api/public/vehicle-image")({
         const safePath = path.replace(/^\/+/, "");
         const video = isVideoPath(safePath);
 
-        const { data, error } = await supabaseAdmin.storage
-          .from("vehicle-images")
-          .createSignedUrl(
+        let signedUrl: string;
+        try {
+          signedUrl = await getSignedUrlCached(
+            supabaseAdmin,
             safePath,
             video ? VIDEO_SIGNED_TTL : IMAGE_SIGNED_TTL,
-            !video ? { transform: { width: 800, resize: "contain", quality: 80 } } : undefined
+            !video ? { width: 800, resize: "contain", quality: 80 } : undefined
           );
-        if (error || !data?.signedUrl) return new Response("Not found", { status: 404 });
+        } catch (err) {
+          return new Response("Not found", { status: 404 });
+        }
 
         // IMAGENS: 302 com cache permanente no browser e na CDN Edge (Cloudflare/Vercel) para velocidade de sub-50ms
         if (!video) {
           return new Response(null, {
             status: 302,
             headers: {
-              location: data.signedUrl,
+              location: signedUrl,
               "cache-control": "public, max-age=31536000, s-maxage=31536000, immutable",
             },
           });
@@ -50,7 +87,7 @@ export const Route = createFileRoute("/api/public/vehicle-image")({
         const upstreamHeaders: Record<string, string> = {};
         if (range) upstreamHeaders["range"] = range;
 
-        const upstream = await fetch(data.signedUrl, { headers: upstreamHeaders });
+        const upstream = await fetch(signedUrl, { headers: upstreamHeaders });
         const headers = new Headers();
         headers.set("content-type", "video/mp4");
         headers.set("accept-ranges", "bytes");
