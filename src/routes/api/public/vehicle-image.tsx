@@ -63,7 +63,7 @@ export const Route = createFileRoute("/api/public/vehicle-image")({
             supabaseAdmin,
             safePath,
             video ? VIDEO_SIGNED_TTL : IMAGE_SIGNED_TTL,
-            !video ? { width: 800, resize: "contain", quality: 80 } : undefined
+            !video ? { width: 800, resize: "contain", quality: 80, format: "webp" } : undefined
           );
         } catch (err) {
           return new Response("Not found", { status: 404 });
