@@ -22,27 +22,54 @@ const FALLBACK_IMAGE =
   );
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Miguel Veículos | Catálogo de veículos" },
-      {
-        name: "description",
-        content:
-          "Miguel Veículos — catálogo de veículos novos e seminovos. Atendimento personalizado com nossa equipe pelo WhatsApp.",
-      },
-      { property: "og:title", content: "Miguel Veículos | Catálogo" },
-      {
-        property: "og:description",
-        content: "Veículos selecionados e atendimento direto pelo WhatsApp com a equipe Miguel Veículos.",
-      },
-      { property: "og:type", content: "website" },
-    ],
-  }),
+  loader: async () => {
+    try {
+      const vehicles = await listVehiclesFn();
+      return { vehicles };
+    } catch (err) {
+      console.error("Loader failed to load vehicles:", err);
+      return { vehicles: [] };
+    }
+  },
+  head: ({ loaderData }) => {
+    const firstThree = loaderData?.vehicles?.slice(0, 3) || [];
+    const preloadLinks = firstThree
+      .map((v) => {
+        const cover = v.images[0];
+        if (!cover) return null;
+        return {
+          rel: "preload",
+          as: "image",
+          href: `/api/public/vehicle-image?path=${encodeURIComponent(cover)}`,
+        };
+      })
+      .filter(Boolean);
+
+    return {
+      meta: [
+        { title: "Miguel Veículos | Catálogo de veículos" },
+        {
+          name: "description",
+          content:
+            "Miguel Veículos — catálogo de veículos novos e seminovos. Atendimento personalizado com nossa equipe pelo WhatsApp.",
+        },
+        { property: "og:title", content: "Miguel Veículos | Catálogo" },
+        {
+          property: "og:description",
+          content: "Veículos selecionados e atendimento direto pelo WhatsApp com a equipe Miguel Veículos.",
+        },
+        { property: "og:type", content: "website" },
+      ],
+      links: preloadLinks as any[],
+    };
+  },
   component: Landing,
 });
 
 function Landing() {
+  const { vehicles: serverVehicles } = Route.useLoaderData();
   const [vehicles, setVehicles] = useState<Vehicle[]>(() => {
+    if (serverVehicles && serverVehicles.length > 0) return serverVehicles;
     if (typeof window !== "undefined") {
       try {
         const cached = localStorage.getItem("mv:vehicles-cache");
