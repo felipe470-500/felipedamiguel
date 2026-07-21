@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Miguel Veículos | Catálogo de veículos</title>
+  <meta name="author" content="Miguel Veículos">
+  <meta name="description" content="Miguel Veículos — catálogo de veículos novos e seminovos. Atendimento personalizado com nossa equipe pelo WhatsApp em Formosa/GO.">
+  <meta name="theme-color" content="#0d0f12">
+
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Miguel Veículos | Catálogo">
+  <meta property="og:description" content="Veículos selecionados e atendimento direto pelo WhatsApp com a equipe Miguel Veículos.">
+  <meta property="og:url" content="https://miguelveiculosfsa.com">
+  <meta property="og:image" content="/assets/hero-bg-BZ7yxVPq.jpg">
+
+  <!-- Preload Critical Images -->
+  <link rel="preload" as="image" href="/assets/logo-1ZDEmsV4.jpg">
+  <link rel="preload" as="image" href="/assets/hero-bg-BZ7yxVPq.jpg">
+  <link rel="icon" type="image/jpeg" href="/assets/logo-1ZDEmsV4.jpg">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- CSS Styles -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <main class="min-h-screen bg-background text-foreground">
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
+      <div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+        <div class="flex items-center gap-2">
+          <a href="#" class="flex items-center gap-2">
+            <img src="/assets/logo-1ZDEmsV4.jpg" alt="Miguel Veículos" class="h-10 w-auto rounded-lg object-contain">
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Banner Section -->
+    <section class="relative overflow-hidden">
+      <img src="/assets/hero-bg-BZ7yxVPq.jpg" alt="Showroom de veículos" width="1600" height="1000" class="absolute inset-0 h-full w-full object-cover opacity-50">
+      <div class="absolute inset-0 hero-gradient-overlay" aria-hidden="true"></div>
+
+      <div class="relative mx-auto max-w-5xl px-4 py-20 sm:py-28">
+        <span class="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-[11px] uppercase tracking-widest text-muted-foreground">
+          <span class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></span>
+          Mais de 30 anos realizando sonhos com transparência e confiança
+        </span>
+
+        <h1 class="mt-4 text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl">
+          O carro certo,<br>
+          <span class="gradient-accent-text">com quem entende.</span>
+        </h1>
+
+        <p class="mt-4 max-w-xl text-base text-muted-foreground sm:text-lg">
+          Veículos novos e seminovos selecionados, aprovação rápida e condições especiais. Fale direto com nossa equipe pelo WhatsApp e leve o seu hoje mesmo.
+        </p>
+
+        <div class="mt-7 flex flex-col gap-3 sm:flex-row">
+          <a href="#catalogo" class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-base font-semibold text-primary-foreground shadow-[var(--shadow-card)] transition-transform active:scale-[0.98] hover:brightness-110">
+            Ver catálogo
+          </a>
+        </div>
+
+        <div class="mt-8 grid grid-cols-3 gap-3 sm:max-w-md">
+          <div class="flex flex-col items-start gap-1.5 rounded-lg border border-border bg-card/60 p-3">
+            <span class="text-primary"><i class="fa-solid fa-shield-halved"></i></span>
+            <span class="text-[11px] leading-tight text-muted-foreground">Procedência garantida</span>
+          </div>
+          <div class="flex flex-col items-start gap-1.5 rounded-lg border border-border bg-card/60 p-3">
+            <span class="text-primary"><i class="fa-regular fa-credit-card"></i></span>
+            <span class="text-[11px] leading-tight text-muted-foreground">Financiamento facilitado</span>
+          </div>
+          <div class="flex flex-col items-start gap-1.5 rounded-lg border border-border bg-card/60 p-3">
+            <span class="text-primary"><i class="fa-regular fa-clock"></i></span>
+            <span class="text-[11px] leading-tight text-muted-foreground">Aprovação rápida</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Catalog Section -->
+    <section id="catalogo" class="mx-auto max-w-5xl px-4 py-16 sm:py-24">
+      <div class="mb-8 flex items-end justify-between gap-4">
+        <div>
+          <p class="text-xs uppercase tracking-widest text-primary">Catálogo</p>
+          <h2 class="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">Veículos em destaque</h2>
+        </div>
+        <p class="hidden text-sm text-muted-foreground sm:block">Toque em um modelo e escolha o vendedor no WhatsApp</p>
+      </div>
+
+      <!-- Filter Controls Bar -->
+      <div id="filterControls" class="mb-8 grid grid-cols-1 gap-4 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)] sm:grid-cols-4">
+        <div class="flex flex-col gap-1">
+          <span class="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Busca</span>
+          <input type="text" id="searchInput" placeholder="Modelo, ano, tag..." class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring text-foreground">
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <span class="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Marca</span>
+          <select id="brandSelect" class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring text-foreground">
+            <option value="">Todas as marcas</option>
+          </select>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <span class="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Ano</span>
+          <select id="yearSelect" class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring text-foreground">
+            <option value="">Qualquer ano</option>
+          </select>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <span class="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Preço máximo</span>
+          <div class="relative">
+            <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">R$</span>
+            <input type="text" id="maxPriceInput" inputmode="numeric" placeholder="Qualquer valor" class="w-full rounded-lg border border-border bg-background pl-9 pr-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring text-foreground">
+          </div>
+        </div>
+
+        <div id="clearFiltersRow" class="sm:col-span-4 flex justify-end" style="display: none;">
+          <button id="clearFiltersBtn" class="text-xs text-muted-foreground hover:text-foreground underline transition-colors">
+            Limpar todos os filtros
+          </button>
+        </div>
+      </div>
+
+      <!-- Vehicle Cards Grid (Dynamic JS Rendered) -->
+      <div id="vehicleGrid" class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <!-- Skeleton Loaders initial paint -->
+        <div class="skeleton-card-item"></div>
+        <div class="skeleton-card-item"></div>
+        <div class="skeleton-card-item"></div>
+      </div>
+
+      <!-- Fallback Empty State -->
+      <div id="emptyCatalogState" class="rounded-2xl border border-dashed border-border bg-card/40 px-6 py-12 text-center" style="display: none;">
+        <p class="text-sm text-muted-foreground">Nenhum veículo corresponde aos filtros selecionados.</p>
+        <button id="resetFiltersEmptyBtn" class="mt-4 inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-2 text-sm font-semibold hover:bg-card">
+          Limpar filtros
+        </button>
+      </div>
+
+    </section>
+
+    <!-- Bottom CTA Section -->
+    <section class="border-t border-border bg-card/40">
+      <div class="mx-auto max-w-3xl px-4 py-16 text-center sm:py-20">
+        <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">Não encontrou o que procura?</h2>
+        <p class="mt-3 text-muted-foreground">Fale com nossa equipe no WhatsApp e encontramos o veículo ideal pra você — com o melhor preço e condições sob medida.</p>
+        <button id="ctaTeamWaBtn" class="mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-whatsapp px-6 py-4 text-base font-semibold text-whatsapp-foreground shadow-[var(--shadow-card)] transition-transform active:scale-[0.98]">
+          <i class="fa-brands fa-whatsapp text-lg"></i> Falar com a equipe Miguel Veículos
+        </button>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-border">
+      <div class="mx-auto max-w-5xl px-4 py-8 text-sm text-muted-foreground">
+        <div class="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p class="font-semibold text-foreground">Miguel Veículos</p>
+          <span class="inline-flex items-center gap-1.5">
+            <i class="fa-solid fa-location-dot text-primary"></i> Atendimento Formosa/GO
+          </span>
+        </div>
+        <div class="mt-4 flex items-center justify-between text-xs">
+          <p>© 2026 Miguel Veículos — Todos os direitos reservados.</p>
+          <a href="/admin" class="inline-flex items-center gap-1 text-muted-foreground/70 hover:text-foreground">
+            <i class="fa-solid fa-lock text-[10px]"></i> Admin
+          </a>
+        </div>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- Vehicle Detail View Lightbox Modal -->
+  <div id="detailModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-md p-0 md:p-4 transition-opacity duration-300" style="display: none;">
+    <div class="relative flex flex-col w-full max-w-2xl h-full md:h-auto md:max-h-[90vh] md:rounded-2xl border-0 md:border border-border bg-card shadow-[var(--shadow-card)] overflow-hidden" onclick="event.stopPropagation()">
+      
+      <button id="closeDetailModal" aria-label="Fechar publicação" class="absolute right-4 top-[env(safe-area-inset-top,24px)] z-[110] w-[44px] h-[44px] rounded-full bg-[rgba(20,20,20,0.75)] hover:bg-[rgba(20,20,20,0.9)] text-white backdrop-blur-md border border-white/10 flex items-center justify-center transition-all active:scale-95 shadow-lg">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <div class="flex-1 overflow-y-auto">
+        <div class="relative aspect-[4/3] md:aspect-[16/10] overflow-hidden bg-black border-b border-border">
+          <img id="detailMainImg" src="" alt="Foto do veículo" class="w-full h-full object-contain">
+          <div id="detailCounter" class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 px-3 py-1 rounded-full bg-black/60 text-white text-[12px] font-medium backdrop-blur-md border border-white/10">
+            1 / 1
+          </div>
+        </div>
+
+        <div class="bg-[#171717] p-6 shadow-[0_-8px_30px_rgb(0,0,0,0.5)] border-t border-white/5 pb-24">
+          <!-- Thumbnail Bar -->
+          <div id="detailThumbTrack" class="flex gap-2 overflow-x-auto pb-4 mb-4"></div>
+
+          <div class="flex flex-col gap-1 mb-3">
+            <h2 id="detailTitle" class="text-2xl font-bold text-white tracking-tight leading-tight">Nome do Veículo</h2>
+            <div id="detailPrice" class="text-3xl font-extrabold text-white tracking-tight">R$ 0</div>
+          </div>
+
+          <div id="detailYearKm" class="flex items-center gap-2 text-white/60 text-sm font-medium mb-4">
+            <span>Ano --</span>
+          </div>
+
+          <div id="detailTagWrap" class="mb-4" style="display: none;">
+            <span id="detailTag" class="bg-primary/20 border border-primary/30 text-primary-foreground rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider">TAG</span>
+          </div>
+
+          <div id="detailDescWrap" class="border-t border-white/10 pt-4 mb-6" style="display: none;">
+            <h3 class="text-xs font-bold text-white/40 uppercase tracking-widest mb-2">Descrição do Vendedor</h3>
+            <p id="detailDesc" class="text-white/80 text-sm leading-relaxed whitespace-pre-wrap font-normal"></p>
+          </div>
+
+          <div class="pt-4 border-t border-white/10 flex flex-col gap-3 sm:flex-row">
+            <button id="detailWaBtn" class="flex-1 h-14 rounded-2xl bg-whatsapp hover:opacity-90 text-whatsapp-foreground font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg text-[15px]">
+              <i class="fa-brands fa-whatsapp text-xl"></i> Falar com a equipe
+            </button>
+            <button id="detailShareBtn" class="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-[#2A2A2A] hover:bg-[#3A3A3A] px-6 h-14 text-sm font-semibold text-white transition-all active:scale-[0.98]">
+              <i class="fa-solid fa-share-nodes text-base"></i> Compartilhar link
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Seller Choice Modal -->
+  <div id="sellerModal" class="fixed inset-0 z-[120] grid place-items-center overflow-y-auto bg-background/80 px-4 py-8 backdrop-blur-md" style="display: none;">
+    <div class="w-full max-w-md rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)]" onclick="event.stopPropagation()">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-bold tracking-tight">Escolha com quem falar</h2>
+          <p class="mt-1 text-xs text-muted-foreground">Selecione um vendedor para continuar no WhatsApp.</p>
+        </div>
+        <button id="closeSellerModal" aria-label="Fechar" class="rounded-md p-1.5 text-muted-foreground hover:bg-background hover:text-foreground">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <ul class="mt-4 space-y-2">
+        <li>
+          <button class="seller-btn flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-background px-3 py-3 text-left transition-colors hover:border-whatsapp hover:bg-card" data-phone="5561999984235" data-name="Felipe da Miguel">
+            <div class="flex items-center gap-3">
+              <span class="grid h-9 w-9 place-items-center rounded-full bg-whatsapp/15 text-whatsapp">
+                <i class="fa-brands fa-whatsapp"></i>
+              </span>
+              <div class="leading-tight">
+                <p class="text-sm font-semibold">Felipe da Miguel</p>
+                <p class="text-[11px] text-muted-foreground">(61) 99998-4235</p>
+              </div>
+            </div>
+            <span class="text-[11px] font-medium text-whatsapp">Falar</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Main JavaScript File -->
+  <script src="app.js"></script>
+</body>
+</html>
