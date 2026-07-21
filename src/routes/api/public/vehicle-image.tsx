@@ -25,11 +25,7 @@ export const Route = createFileRoute("/api/public/vehicle-image")({
 
         const { data, error } = await supabaseAdmin.storage
           .from("vehicle-images")
-          .createSignedUrl(
-            safePath,
-            video ? VIDEO_SIGNED_TTL : IMAGE_SIGNED_TTL,
-            !video ? { transform: { width: 720, quality: 75 } } : undefined
-          );
+          .createSignedUrl(safePath, video ? VIDEO_SIGNED_TTL : IMAGE_SIGNED_TTL);
         if (error || !data?.signedUrl) return new Response("Not found", { status: 404 });
 
         // IMAGENS: 302 com cache — browser não bate no servidor toda vez
