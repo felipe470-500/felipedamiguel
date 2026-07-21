@@ -679,7 +679,7 @@ const VehicleCard = memo(function VehicleCard({
       {/* Container da Foto de Capa (Padrão OLX - Clicar abre a galeria completa) */}
       <div
         onClick={onClick}
-        className="relative aspect-[4/3] overflow-hidden bg-muted cursor-pointer"
+        className="relative aspect-[16/10] overflow-hidden bg-[#101318] cursor-pointer"
       >
         {isVideoUrl(coverImage) ? (
           <div className="relative flex h-full w-full items-center justify-center bg-muted">
