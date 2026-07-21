@@ -702,6 +702,8 @@ const VehicleCard = memo(function VehicleCard({
               alt={vehicle.name}
               loading="eager"
               decoding="async"
+              // @ts-ignore
+              fetchpriority="high"
               className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
               style={{ objectFit: "contain", width: "100%", height: "100%" }}
               onError={(e) => {

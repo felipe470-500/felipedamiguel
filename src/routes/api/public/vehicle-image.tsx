@@ -28,13 +28,13 @@ export const Route = createFileRoute("/api/public/vehicle-image")({
           .createSignedUrl(safePath, video ? VIDEO_SIGNED_TTL : IMAGE_SIGNED_TTL);
         if (error || !data?.signedUrl) return new Response("Not found", { status: 404 });
 
-        // IMAGENS: 302 com cache — browser não bate no servidor toda vez
+        // IMAGENS: 302 com cache permanente no browser e na CDN Edge (Cloudflare/Vercel) para velocidade de sub-50ms
         if (!video) {
           return new Response(null, {
             status: 302,
             headers: {
               location: data.signedUrl,
-              "cache-control": `public, max-age=${IMAGE_CACHE_MAXAGE}, immutable`,
+              "cache-control": "public, max-age=31536000, s-maxage=31536000, immutable",
             },
           });
         }
