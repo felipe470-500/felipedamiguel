@@ -695,6 +695,7 @@ const VehicleCard = memo(function VehicleCard({
               <PlayCircle className="h-10 w-10" />
             </div>
           </div>
+        ) : (
           <div className="flex h-full w-full items-center justify-center bg-[#15181e]">
             <MediaImg
               src={coverImage}
@@ -710,6 +711,7 @@ const VehicleCard = memo(function VehicleCard({
               }}
             />
           </div>
+        )}
 
         {vehicle.tag && (
           <span className="absolute left-3 top-3 rounded-full bg-[image:var(--gradient-accent)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-primary-foreground z-10">
