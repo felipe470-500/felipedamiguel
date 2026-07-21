@@ -46,7 +46,9 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
               <MediaVideo
                 src={i === idx ? src : undefined}
                 controls
+                autoPlay
                 muted
+                loop
                 playsInline
                 preload={i === idx ? "metadata" : "none"}
                 className="w-full h-auto max-h-full max-w-full"

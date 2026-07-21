@@ -146,16 +146,14 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
                     {isVideoUrl(src) ? (
                       <MediaVideo
                         src={i === idx ? src : undefined}
-                        controls={false}
+                        controls
+                        autoPlay
                         muted
+                        loop
                         playsInline
                         preload={i === idx ? "metadata" : "none"}
                         className="max-h-full max-w-full block cursor-pointer"
                         style={{ objectFit: "contain" }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setLightboxOpen(true);
-                        }}
                       />
                     ) : (
                       <MediaImg
