@@ -23,21 +23,26 @@ export const Route = createFileRoute("/api/public/vehicle-image")({
         const safePath = path.replace(/^\/+/, "");
         const video = isVideoPath(safePath);
 
+        // IMAGENS: 302 instantâneo (<1ms) usando publicUrl — evita bater na API do Supabase e estourar limite de requisições
+        if (!video) {
+          const { data: pubData } = supabaseAdmin.storage
+            .from("vehicle-images")
+            .getPublicUrl(safePath);
+          if (pubData?.publicUrl) {
+            return new Response(null, {
+              status: 302,
+              headers: {
+                location: pubData.publicUrl,
+                "cache-control": `public, max-age=${IMAGE_CACHE_MAXAGE}, immutable`,
+              },
+            });
+          }
+        }
+
         const { data, error } = await supabaseAdmin.storage
           .from("vehicle-images")
-          .createSignedUrl(safePath, video ? VIDEO_SIGNED_TTL : IMAGE_SIGNED_TTL);
+          .createSignedUrl(safePath, VIDEO_SIGNED_TTL);
         if (error || !data?.signedUrl) return new Response("Not found", { status: 404 });
-
-        // IMAGENS: 302 com cache — browser não bate no servidor toda vez
-        if (!video) {
-          return new Response(null, {
-            status: 302,
-            headers: {
-              location: data.signedUrl,
-              "cache-control": `public, max-age=${IMAGE_CACHE_MAXAGE}, immutable`,
-            },
-          });
-        }
 
         // VÍDEOS: proxy com Content-Type: video/mp4 e suporte a Range.
         // Muitos .mov do iPhone são H.264/AAC e tocam em qualquer navegador quando
