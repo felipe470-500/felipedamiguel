@@ -140,7 +140,11 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
                 {images.map((src, i) => (
                   <div
                     key={i}
-                    onClick={() => setLightboxOpen(true)}
+                    onClick={() => {
+                      if (!isVideoUrl(src)) {
+                        setLightboxOpen(true);
+                      }
+                    }}
                     className="h-full w-full flex-shrink-0 snap-start snap-always flex items-center justify-center bg-black cursor-zoom-in"
                   >
                     {isVideoUrl(src) ? (
@@ -154,6 +158,9 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
                         preload={i === idx ? "metadata" : "none"}
                         className="max-h-full max-w-full block cursor-pointer"
                         style={{ objectFit: "contain" }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
                       />
                     ) : (
                       <MediaImg
