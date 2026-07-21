@@ -718,9 +718,9 @@ const VehicleCard = memo(function VehicleCard({
                     </div>
                   )}
                 </div>
-              ) : (
+              ) : Math.abs(mediaIndex - idx) <= 1 ? (
                 <MediaImg
-                  src={Math.abs(mediaIndex - idx) <= 1 ? src : ""}
+                  src={src}
                   alt={`${vehicle.name} - Foto ${mediaIndex + 1}`}
                   loading={mediaIndex === 0 ? "eager" : "lazy"}
                   decoding="async"
@@ -732,6 +732,8 @@ const VehicleCard = memo(function VehicleCard({
                     img.src = FALLBACK_IMAGE;
                   }}
                 />
+              ) : (
+                <div className="h-full w-full bg-secondary" />
               )}
             </div>
           ))}
