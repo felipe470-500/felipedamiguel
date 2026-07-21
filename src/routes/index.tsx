@@ -18,7 +18,7 @@ import { trackWhatsAppClick, type TrackingParams } from "@/lib/analytics";
 const FALLBACK_IMAGE =
   "data:image/svg+xml;utf8," +
   encodeURIComponent(
-    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'><rect width='400' height='300' fill='#1a1a1a'/><g fill='#666' font-family='sans-serif' text-anchor='middle'><text x='200' y='150' font-size='16'>Imagem indisponível</text><text x='200' y='175' font-size='12'>Miguel Veículos</text></g></svg>`,
+    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'><rect width='400' height='300' fill='#15181e'/><g font-family='sans-serif' text-anchor='middle'><text x='200' y='145' fill='#f1f5f9' font-size='18' font-weight='bold'>Miguel Veículos</text><text x='200' y='172' fill='#94a3b8' font-size='12'>Toque para ver no WhatsApp</text></g></svg>`,
   );
 
 export const Route = createFileRoute("/")({
