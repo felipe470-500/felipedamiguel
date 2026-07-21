@@ -720,7 +720,7 @@ const VehicleCard = memo(function VehicleCard({
                 </div>
               ) : (
                 <MediaImg
-                  src={src}
+                  src={Math.abs(mediaIndex - idx) <= 1 ? src : ""}
                   alt={`${vehicle.name} - Foto ${mediaIndex + 1}`}
                   loading={mediaIndex === 0 ? "eager" : "lazy"}
                   decoding="async"
