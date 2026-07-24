@@ -77,6 +77,5 @@ export function trackEvent(event: string, params: TrackingParams) {
 }
 
 export function trackWhatsAppClick(params: TrackingParams) {
-  trackEvent("WhatsAppClick", params);
   trackEvent("Contact", params);
 }
