@@ -12,7 +12,7 @@ import { SellerPickerDialog } from "@/components/SellerPicker";
 import { ImageViewer } from "@/components/vehicle-viewer/ImageViewer";
 import { MediaImg, MediaVideo } from "@/components/vehicle-viewer/MediaFallback";
 import { buildVehicleShareUrl } from "@/lib/canonical-url";
-import { trackWhatsAppClick, type TrackingParams } from "@/lib/analytics";
+import { trackWhatsAppClick, trackEvent, type TrackingParams } from "@/lib/analytics";
 
 
 const FALLBACK_IMAGE =
@@ -816,7 +816,17 @@ const VehicleCard = memo(function VehicleCard({
               if (typeof window === "undefined") return;
               const shareUrl = buildVehicleShareUrl(vehicle.id);
               const text = `Confira este veículo na Miguel Veículos: *${vehicle.name}* (${vehicle.year}) - *${vehicle.price}*. Veja mais fotos e detalhes direto no link: ${shareUrl}`;
-              window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
+              
+              trackEvent("Contact", {
+                source: "share_card_whatsapp",
+                vehicle_name: vehicle.name,
+                vehicle_year: vehicle.year,
+                vehicle_price: vehicle.price,
+              });
+
+              setTimeout(() => {
+                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
+              }, 300);
             }}
 
             title="Compartilhar veículo no WhatsApp"

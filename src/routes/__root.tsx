@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import logoUrl from "../assets/logo.jpg?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { initAnalytics } from "../lib/analytics";
 
 function NotFoundComponent() {
   return (
@@ -73,10 +74,6 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-// TODO: substitua pelos seus IDs reais antes de publicar
-const META_PIXEL_ID = "296429546487036";
-const GOOGLE_TAG_ID = "G-XXXXXXXXXX"; // GA4 ou AW-XXXXXXXXX para Google Ads
-
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
@@ -136,34 +133,6 @@ function RootComponent() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-
-    const initAnalytics = () => {
-      // 1. Facebook Pixel
-      if (!(window as any).fbq) {
-        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-        n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-        n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-        t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
-        document,'script','https://connect.facebook.net/en_US/fbevents.js');
-        (window as any).fbq('init', META_PIXEL_ID);
-        (window as any).fbq('track', 'PageView');
-      }
-
-      // 2. Google Analytics (GA4)
-      if (!(window as any).gtag) {
-        const script = document.createElement("script");
-        script.src = `https://www.googletagmanager.com/gtag/js?id=${GOOGLE_TAG_ID}`;
-        script.async = true;
-        document.head.appendChild(script);
-
-        (window as any).dataLayer = (window as any).dataLayer || [];
-        (window as any).gtag = function() {
-          (window as any).dataLayer.push(arguments);
-        };
-        (window as any).gtag('js', new Date());
-        (window as any).gtag('config', GOOGLE_TAG_ID);
-      }
-    };
 
     let loaded = false;
     const triggerLoad = () => {

@@ -36,9 +36,11 @@ export function SellerPickerDialog({
     trackEvent("Contact", params);
     const url = whatsappLink(seller.phone, message);
 
-    const win = window.open(url, "_blank", "noopener,noreferrer");
-    if (!win) window.location.href = url;
-    onClose();
+    setTimeout(() => {
+      const win = window.open(url, "_blank", "noopener,noreferrer");
+      if (!win) window.location.href = url;
+      onClose();
+    }, 300);
   }
 
 
