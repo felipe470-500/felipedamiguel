@@ -12,7 +12,6 @@ export const SELLERS: Seller[] = [
   { id: "miguel", name: "Miguel", phone: "5561996290937" },
   { id: "vixtor", name: "Victor Hugo", phone: "5561995957439" },
   { id: "anderson", name: "Anderson Miguel", phone: "5561999021887" },
-  { id: "felipe-vendedor", name: "Felipe", phone: "5561999984235" },
 ];
 
 export function whatsappLink(phone: string, message?: string): string {
