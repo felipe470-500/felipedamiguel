@@ -1,6 +1,7 @@
 import { MessageCircle, X } from "lucide-react";
 import { SELLERS, formatSellerPhone, whatsappLink, type Seller } from "@/lib/sellers";
 import { trackEvent, type TrackingParams } from "@/lib/analytics";
+import andersonAvatar from "@/assets/anderson-miguel.jpg.asset.json";
 
 
 
