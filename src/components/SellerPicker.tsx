@@ -1,6 +1,7 @@
 import { MessageCircle, X } from "lucide-react";
 import { SELLERS, formatSellerPhone, whatsappLink, type Seller } from "@/lib/sellers";
 import { trackEvent, type TrackingParams } from "@/lib/analytics";
+import andersonAvatar from "@/assets/anderson-miguel.jpg.asset.json";
 
 
 
@@ -68,36 +69,42 @@ export function SellerPickerDialog({
         </div>
 
         <ul className="mt-4 space-y-2">
-          {SELLERS.map((s) => (
-            <li key={s.id}>
-              <button
-                onClick={() => choose(s)}
-                className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-background px-3 py-3 text-left transition-colors hover:border-whatsapp hover:bg-card"
-              >
-                <div className="flex items-center gap-3">
-                  {profiles?.[s.id] ? (
-                    <img
-                      src={profiles[s.id]!}
-                      alt={s.name}
-                      loading="lazy"
-                      className="h-9 w-9 rounded-full object-cover border border-border bg-muted"
-                    />
-                  ) : (
-                    <span className="grid h-9 w-9 place-items-center rounded-full bg-whatsapp/15 text-whatsapp">
-                      <MessageCircle className="h-4 w-4" />
-                    </span>
-                  )}
-                  <div className="leading-tight">
-                    <p className="text-sm font-semibold">{s.name}</p>
-                    <p className="text-[11px] text-muted-foreground">
-                      {formatSellerPhone(s.phone)}
-                    </p>
+          {SELLERS.map((s) => {
+            const avatarUrl =
+              s.id === "anderson"
+                ? andersonAvatar.url
+                : profiles?.[s.id] ?? null;
+            return (
+              <li key={s.id}>
+                <button
+                  onClick={() => choose(s)}
+                  className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-background px-3 py-3 text-left transition-colors hover:border-whatsapp hover:bg-card"
+                >
+                  <div className="flex items-center gap-3">
+                    {avatarUrl ? (
+                      <img
+                        src={avatarUrl}
+                        alt={s.name}
+                        loading="lazy"
+                        className="h-9 w-9 rounded-full object-cover border border-border bg-muted"
+                      />
+                    ) : (
+                      <span className="grid h-9 w-9 place-items-center rounded-full bg-whatsapp/15 text-whatsapp">
+                        <MessageCircle className="h-4 w-4" />
+                      </span>
+                    )}
+                    <div className="leading-tight">
+                      <p className="text-sm font-semibold">{s.name}</p>
+                      <p className="text-[11px] text-muted-foreground">
+                        {formatSellerPhone(s.phone)}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <span className="text-[11px] font-medium text-whatsapp">Falar</span>
-              </button>
-            </li>
-          ))}
+                  <span className="text-[11px] font-medium text-whatsapp">Falar</span>
+                </button>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </div>
