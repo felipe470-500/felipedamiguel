@@ -126,7 +126,6 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
-import { useEffect } from "react";
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
