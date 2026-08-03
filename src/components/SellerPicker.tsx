@@ -76,9 +76,9 @@ export function SellerPickerDialog({
                 className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-background px-3 py-3 text-left transition-colors hover:border-whatsapp hover:bg-card"
               >
                 <div className="flex items-center gap-3">
-                  {profiles?.[s.id] ? (
+                  {s.id === "anderson" || profiles?.[s.id] ? (
                     <img
-                      src={profiles[s.id]!}
+                      src={s.id === "anderson" ? andersonAvatar.url : profiles[s.id]!}
                       alt={s.name}
                       loading="lazy"
                       className="h-9 w-9 rounded-full object-cover border border-border bg-muted"
