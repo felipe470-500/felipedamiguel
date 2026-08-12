@@ -39,6 +39,7 @@ export function LeadGate({ onDone }: { onDone: () => void }) {
           desired_car: desiredCar.trim() || null,
         },
       });
+      setAdvancedMatching({ phone: whatsapp.trim() });
       localStorage.setItem(STORAGE_KEY, "1");
       onDone();
     } catch (e) {
