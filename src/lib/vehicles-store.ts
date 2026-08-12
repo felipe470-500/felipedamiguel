@@ -80,8 +80,13 @@ export const WHATSAPP_LINK = "https://wa.me/message/QBRI64EHLEE4H1";
 export const WHATSAPP_DISPLAY = "(61) 99998-4235";
 export const WHATSAPP_TEL = "+5561999984235";
 
-// Admin: senha simples (altere aqui quando quiser)
-export const ADMIN_PASSWORD = "felipe2026";
+// Admin: a senha NÃO fica no código do cliente. Ela é validada no servidor
+// (variável de ambiente ADMIN_PASSWORD) e guardada só na sessão do navegador.
+export const ADMIN_PWD_KEY = "fdm_admin_pwd";
+export function getAdminPassword(): string {
+  if (typeof window === "undefined") return "";
+  return sessionStorage.getItem(ADMIN_PWD_KEY) || "";
+}
 export const ADMIN_SESSION_KEY = "fdm_admin_ok";
 export const ADMIN_SELLER_ID_KEY = "fdm_admin_seller_id";
 export const ADMIN_SELLER_NAME_KEY = "fdm_admin_seller_name";
