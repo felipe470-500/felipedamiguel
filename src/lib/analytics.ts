@@ -80,7 +80,14 @@ export function initAnalytics() {
     t.src = "https://connect.facebook.net/en_US/fbevents.js";
     const s = document.getElementsByTagName("script")[0];
     s?.parentNode?.insertBefore(t, s);
-    w.fbq("init", META_PIXEL_ID);
+    // Advanced Matching manual: envia email/telefone em texto puro APENAS
+    // quando o usuário já informou esses dados no site (o pixel faz o hash).
+    const am = getAdvancedMatching();
+    if (am.em || am.ph) {
+      w.fbq("init", META_PIXEL_ID, am);
+    } else {
+      w.fbq("init", META_PIXEL_ID);
+    }
     w.fbq("track", "PageView");
   }
 

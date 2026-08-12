@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { MessageCircle, Car } from "lucide-react";
 import { saveLeadFn } from "@/lib/settings.functions";
+import { setAdvancedMatching } from "@/lib/analytics";
 
 const STORAGE_KEY = "fdm_lead_ok";
 
