@@ -266,6 +266,7 @@ function Editor({
         data: {
           password: ADMIN_PASSWORD,
           vehicles: items.map((v) => ({
+            id: v.id && !v.id.startsWith("tmp-") ? v.id : null,
             name: v.name,
             year: v.year,
             km: v.km,
