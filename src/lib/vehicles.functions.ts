@@ -5,6 +5,7 @@ import { z } from "zod";
 const ADMIN_PASSWORD = "felipe2026";
 
 const VehicleInput = z.object({
+  id: z.string().uuid().nullable().optional(),
   name: z.string(),
   year: z.string().default(""),
   km: z.string().default(""),
