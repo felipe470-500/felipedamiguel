@@ -78,15 +78,13 @@ export const saveVehiclesFn = createServerFn({ method: "POST" })
     if (data.password !== ADMIN_PASSWORD) throw new Error("Senha incorreta");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // Substitui o catálogo inteiro pelo conteúdo enviado pelo admin
-    const { error: delErr } = await supabaseAdmin
-      .from("vehicles")
-      .delete()
-      .neq("id", "00000000-0000-0000-0000-000000000000");
-    if (delErr) throw new Error(delErr.message);
+    // Preserva os IDs existentes (links compartilhados continuam válidos) e
+    // só remove os veículos ausentes DEPOIS que a gravação der certo.
+    const keepIds: string[] = [];
 
     if (data.vehicles.length > 0) {
       const rows = data.vehicles.map((v, i) => ({
+        ...(v.id ? { id: v.id } : {}),
         name: v.name,
         year: v.year ?? "",
         km: v.km ?? "",
@@ -97,9 +95,37 @@ export const saveVehiclesFn = createServerFn({ method: "POST" })
         description: v.description ?? null,
         position: i,
       }));
-      const { error: insErr } = await supabaseAdmin.from("vehicles").insert(rows);
-      if (insErr) throw new Error(insErr.message);
+
+      const existing = rows.filter((r) => "id" in r);
+      const created = rows.filter((r) => !("id" in r));
+
+      if (existing.length > 0) {
+        const { data: up, error: upErr } = await supabaseAdmin
+          .from("vehicles")
+          .upsert(existing, { onConflict: "id" })
+          .select("id");
+        if (upErr) throw new Error(upErr.message);
+        keepIds.push(...(up ?? []).map((r) => r.id));
+      }
+
+      if (created.length > 0) {
+        const { data: ins, error: insErr } = await supabaseAdmin
+          .from("vehicles")
+          .insert(created)
+          .select("id");
+        if (insErr) throw new Error(insErr.message);
+        keepIds.push(...(ins ?? []).map((r) => r.id));
+      }
     }
+
+    // Remove apenas os que não estão mais no catálogo enviado.
+    const del = supabaseAdmin.from("vehicles").delete();
+    const { error: delErr } =
+      keepIds.length > 0
+        ? await del.not("id", "in", `(${keepIds.join(",")})`)
+        : await del.neq("id", "00000000-0000-0000-0000-000000000000");
+    if (delErr) throw new Error(delErr.message);
+
     return { ok: true };
   });
 
