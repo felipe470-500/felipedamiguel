@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-const ADMIN_PASSWORD = "felipe2026";
 
 export const getSiteSettingsFn = createServerFn({ method: "GET" }).handler(async () => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -19,7 +18,8 @@ export const setLeadGateFn = createServerFn({ method: "POST" })
     z.object({ password: z.string(), enabled: z.boolean() }).parse(input),
   )
   .handler(async ({ data }) => {
-    if (data.password !== ADMIN_PASSWORD) throw new Error("Senha incorreta");
+    const { assertAdminPassword } = await import("@/lib/admin-auth.server");
+    assertAdminPassword(data.password);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin
       .from("site_settings")
@@ -57,7 +57,8 @@ export const saveLeadFn = createServerFn({ method: "POST" })
 export const listLeadsFn = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => z.object({ password: z.string() }).parse(input))
   .handler(async ({ data }) => {
-    if (data.password !== ADMIN_PASSWORD) throw new Error("Senha incorreta");
+    const { assertAdminPassword } = await import("@/lib/admin-auth.server");
+    assertAdminPassword(data.password);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("leads")
@@ -93,7 +94,8 @@ export const saveSellerProfileFn = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }) => {
-    if (data.password !== ADMIN_PASSWORD) throw new Error("Senha incorreta");
+    const { assertAdminPassword } = await import("@/lib/admin-auth.server");
+    assertAdminPassword(data.password);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin
       .from("seller_profiles")

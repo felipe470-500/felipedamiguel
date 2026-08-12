@@ -1,8 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-// Senha admin (mesma do client). Validada também no servidor para proteger writes.
-const ADMIN_PASSWORD = "felipe2026";
 
 const VehicleInput = z.object({
   id: z.string().uuid().nullable().optional(),
@@ -75,7 +73,8 @@ export const saveVehiclesFn = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }) => {
-    if (data.password !== ADMIN_PASSWORD) throw new Error("Senha incorreta");
+    const { assertAdminPassword } = await import("@/lib/admin-auth.server");
+    assertAdminPassword(data.password);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     // Preserva os IDs existentes (links compartilhados continuam válidos) e
@@ -139,7 +138,8 @@ export const uploadVehicleImageFn = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }) => {
-    if (data.password !== ADMIN_PASSWORD) throw new Error("Senha incorreta");
+    const { assertAdminPassword } = await import("@/lib/admin-auth.server");
+    assertAdminPassword(data.password);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const match = data.dataUrl.match(/^data:((?:image|video)\/[a-zA-Z0-9+.-]+);base64,(.+)$/);
@@ -173,7 +173,8 @@ export const createVehicleUploadUrlFn = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }) => {
-    if (data.password !== ADMIN_PASSWORD) throw new Error("Senha incorreta");
+    const { assertAdminPassword } = await import("@/lib/admin-auth.server");
+    assertAdminPassword(data.password);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const extTemp = (data.contentType.split("/")[1] || "bin").replace("jpeg", "jpg").split(";")[0];
