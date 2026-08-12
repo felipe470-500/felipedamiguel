@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, ImagePlus, Plus, Save, Trash2, LogOut, X, Star, Download, Search, Share2, Camera } from "lucide-react";
 import {
-  ADMIN_PASSWORD,
+  ADMIN_PWD_KEY,
+  getAdminPassword,
   ADMIN_SESSION_KEY,
   ADMIN_SELLER_ID_KEY,
   ADMIN_SELLER_NAME_KEY,
@@ -26,6 +27,7 @@ import {
   listLeadsFn,
   listSellerProfilesFn,
   saveSellerProfileFn,
+  verifyAdminPasswordFn,
 } from "@/lib/settings.functions";
 
 export const Route = createFileRoute("/admin")({
@@ -53,15 +55,25 @@ function AdminPage() {
     setLoggedSellerId(sessionStorage.getItem(ADMIN_SELLER_ID_KEY) || "");
   }, []);
  
-  function handleLogin(e: React.FormEvent) {
+  const verifyPassword = useServerFn(verifyAdminPasswordFn);
+
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     if (!sellerId) {
       setError("Selecione um vendedor");
       return;
     }
-    if (pwd === ADMIN_PASSWORD) {
+    let valid = false;
+    try {
+      const res = await verifyPassword({ data: { password: pwd } });
+      valid = !!res?.ok;
+    } catch {
+      valid = false;
+    }
+    if (valid) {
       const seller = SELLERS.find((s) => s.id === sellerId);
       if (seller) {
+        sessionStorage.setItem(ADMIN_PWD_KEY, pwd);
         sessionStorage.setItem(ADMIN_SESSION_KEY, "1");
         sessionStorage.setItem(ADMIN_SELLER_ID_KEY, seller.id);
         sessionStorage.setItem(ADMIN_SELLER_NAME_KEY, seller.name);
@@ -76,6 +88,7 @@ function AdminPage() {
   }
  
   function logout() {
+    sessionStorage.removeItem(ADMIN_PWD_KEY);
     sessionStorage.removeItem(ADMIN_SESSION_KEY);
     sessionStorage.removeItem(ADMIN_SELLER_ID_KEY);
     sessionStorage.removeItem(ADMIN_SELLER_NAME_KEY);
@@ -165,7 +178,7 @@ function Editor({
   async function uploadFile(file: File): Promise<string> {
     if (file.type.startsWith("video/")) {
       const { path, token, publicUrl } = await createUploadUrl({
-        data: { password: ADMIN_PASSWORD, contentType: file.type },
+        data: { password: getAdminPassword(), contentType: file.type },
       });
       const { error } = await supabase.storage
         .from("vehicle-images")
@@ -174,7 +187,7 @@ function Editor({
       return publicUrl;
     }
     const dataUrl = await fileToCompressedDataURL(file);
-    const res = await uploadImage({ data: { password: ADMIN_PASSWORD, dataUrl } });
+    const res = await uploadImage({ data: { password: getAdminPassword(), dataUrl } });
     return res.url;
   }
 
@@ -221,13 +234,13 @@ function Editor({
       const compressedDataUrl = await fileToCompressedDataURL(file);
       const uploadRes = await uploadImage({
         data: {
-          password: ADMIN_PASSWORD,
+          password: getAdminPassword(),
           dataUrl: compressedDataUrl,
         },
       });
       await saveSellerProfile({
         data: {
-          password: ADMIN_PASSWORD,
+          password: getAdminPassword(),
           sellerId,
           avatarUrl: uploadRes.url,
         },
@@ -264,7 +277,7 @@ function Editor({
     try {
       await saveVehicles({
         data: {
-          password: ADMIN_PASSWORD,
+          password: getAdminPassword(),
           vehicles: items.map((v) => ({
             id: v.id && !v.id.startsWith("tmp-") ? v.id : null,
             name: v.name,
@@ -333,7 +346,7 @@ function Editor({
           if (src.startsWith("data:image/")) {
             try {
               const r = await uploadImage({
-                data: { password: ADMIN_PASSWORD, dataUrl: src },
+                data: { password: getAdminPassword(), dataUrl: src },
               });
               urls.push(r.url);
             } catch (err) {
@@ -834,7 +847,7 @@ function GatePanel() {
     setMsg("");
     try {
       const next = !enabled;
-      await setGate({ data: { password: ADMIN_PASSWORD, enabled: next } });
+      await setGate({ data: { password: getAdminPassword(), enabled: next } });
       setEnabled(next);
       setMsg(next ? "✓ Formulário ativado para visitantes." : "✓ Formulário desativado.");
     } catch (e) {
@@ -847,7 +860,7 @@ function GatePanel() {
   async function loadLeads() {
     setLoadingLeads(true);
     try {
-      const rows = await listLeads({ data: { password: ADMIN_PASSWORD } });
+      const rows = await listLeads({ data: { password: getAdminPassword() } });
       setLeads(rows as LeadRow[]);
       setShowLeads(true);
     } catch (e) {
@@ -898,7 +911,7 @@ function GatePanel() {
               const rows =
                 leads.length > 0
                   ? leads
-                  : ((await listLeads({ data: { password: ADMIN_PASSWORD } })) as LeadRow[]);
+                  : ((await listLeads({ data: { password: getAdminPassword() } })) as LeadRow[]);
               if (!rows || rows.length === 0) {
                 setMsg("Nenhum contato para baixar ainda.");
                 return;

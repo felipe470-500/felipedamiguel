@@ -108,3 +108,11 @@ export const saveSellerProfileFn = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+
+export const verifyAdminPasswordFn = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => z.object({ password: z.string() }).parse(input))
+  .handler(async ({ data }) => {
+    const { assertAdminPassword } = await import("@/lib/admin-auth.server");
+    assertAdminPassword(data.password);
+    return { ok: true };
+  });
