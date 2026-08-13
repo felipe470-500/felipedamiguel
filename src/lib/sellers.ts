@@ -7,7 +7,7 @@ export type Seller = {
 
 export const SELLERS: Seller[] = [
   { id: "djan", name: "Djean", phone: "5561998418014" },
-  { id: "caio", name: "Caio Victor", phone: "5561996093726" },
+  { id: "felipe", name: "Felipe Miranda", phone: "5561996409981" },
   { id: "felipe", name: "Felipe Miranda", phone: "5561996409981" },
   { id: "miguel", name: "Miguel", phone: "5561996290937" },
   { id: "vixtor", name: "Victor Hugo", phone: "5561995957439" },
