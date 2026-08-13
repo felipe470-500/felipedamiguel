@@ -47,22 +47,43 @@ export const Route = createFileRoute("/")({
 
     return {
       meta: [
-        { title: "Miguel Veículos | Catálogo de veículos" },
+        { title: "Carros novos e seminovos | Miguel Veículos" },
         {
           name: "description",
           content:
-            "Miguel Veículos — catálogo de veículos novos e seminovos. Atendimento personalizado com nossa equipe pelo WhatsApp.",
+            "Catálogo de carros novos e seminovos da Miguel Veículos: filtre por marca, ano e preço e fale direto com um vendedor pelo WhatsApp.",
         },
-        { property: "og:title", content: "Miguel Veículos | Catálogo" },
+        { property: "og:title", content: "Catálogo de carros novos e seminovos — Miguel Veículos" },
         {
           property: "og:description",
-          content: "Veículos selecionados e atendimento direto pelo WhatsApp com a equipe Miguel Veículos.",
+          content:
+            "Veja os veículos disponíveis, filtre por marca, ano e preço e fale com um vendedor da Miguel Veículos pelo WhatsApp.",
         },
         { property: "og:type", content: "website" },
+        { property: "og:url", content: "https://miguelveiculosfsa.com/" },
       ],
-      links: preloadLinks as any[],
+      links: [
+        { rel: "canonical", href: "https://miguelveiculosfsa.com/" },
+        ...(preloadLinks as any[]),
+      ],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "AutoDealer",
+            name: "Miguel Veículos",
+            url: "https://miguelveiculosfsa.com/",
+            description:
+              "Revenda de carros novos e seminovos com mais de 30 anos de experiência e atendimento pelo WhatsApp.",
+            image: "https://miguelveiculosfsa.com/",
+            areaServed: "Formosa, GO",
+          }),
+        },
+      ],
     };
   },
+
   component: Landing,
 });
 
