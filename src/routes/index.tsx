@@ -515,8 +515,9 @@ function Landing() {
           <div className="mb-8 grid grid-cols-1 gap-4 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)] sm:grid-cols-4">
             {/* Busca */}
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Busca</span>
+              <label htmlFor="filtro-busca" className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Busca</label>
               <input
+                id="filtro-busca"
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -527,8 +528,9 @@ function Landing() {
             
             {/* Marca */}
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Marca</span>
+              <label htmlFor="filtro-marca" className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Marca</label>
               <select
+                id="filtro-marca"
                 value={selectedBrand}
                 onChange={(e) => setSelectedBrand(e.target.value)}
                 className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring text-foreground"
@@ -544,8 +546,9 @@ function Landing() {
  
             {/* Ano */}
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Ano</span>
+              <label htmlFor="filtro-ano" className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Ano</label>
               <select
+                id="filtro-ano"
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(e.target.value)}
                 className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring text-foreground"
@@ -561,12 +564,13 @@ function Landing() {
  
             {/* Preço */}
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Preço máximo</span>
+              <label htmlFor="filtro-preco" className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Preço máximo</label>
               <div className="relative">
                 <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
                   R$
                 </span>
                 <input
+                  id="filtro-preco"
                   type="text"
                   inputMode="numeric"
                   value={maxPrice !== "" ? Number(maxPrice).toLocaleString("pt-BR") : ""}
@@ -580,6 +584,7 @@ function Landing() {
                 />
               </div>
             </div>
+
             
             {/* Limpar Filtros */}
             {(search || selectedBrand || selectedYear || maxPrice !== "") && (
