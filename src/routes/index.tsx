@@ -76,7 +76,7 @@ export const Route = createFileRoute("/")({
             url: "https://miguelveiculosfsa.com/",
             description:
               "Revenda de carros novos e seminovos com mais de 30 anos de experiência e atendimento pelo WhatsApp.",
-            image: "https://miguelveiculosfsa.com/",
+            image: "https://miguelveiculosfsa.com/assets/logo-1ZDEmsV4.jpg",
             areaServed: "Formosa, GO",
           }),
         },
@@ -468,12 +468,13 @@ function Landing() {
             Mais de 30 anos realizando sonhos com transparência e confiança
           </span>
           <h1 className="mt-4 text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl">
-            O carro certo,
+            Carros novos e seminovos em Formosa
             <br />
             <span className="bg-[image:var(--gradient-accent)] bg-clip-text text-transparent">
-              com quem entende.
+              Miguel Veículos
             </span>
           </h1>
+
           <p className="mt-4 max-w-xl text-base text-muted-foreground sm:text-lg">
             Veículos novos e seminovos selecionados, aprovação rápida e condições especiais.
             Fale direto com nossa equipe pelo WhatsApp e leve o seu hoje mesmo.
