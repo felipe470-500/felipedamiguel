@@ -33,10 +33,21 @@ import {
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "Admin | Miguel Veículos" },
+      { title: "Painel do vendedor | Miguel Veículos" },
+      {
+        name: "description",
+        content:
+          "Área restrita da Miguel Veículos para vendedores: cadastro de veículos, fotos do catálogo e acompanhamento dos contatos recebidos.",
+      },
+      { property: "og:title", content: "Painel do vendedor | Miguel Veículos" },
+      {
+        property: "og:description",
+        content: "Área restrita para gestão do catálogo e dos contatos da Miguel Veículos.",
+      },
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
+
   component: AdminPage,
 });
 

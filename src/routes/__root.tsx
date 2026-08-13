@@ -79,15 +79,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Miguel Veículos | Catálogo de veículos" },
-      { name: "description", content: "Miguel Veículos — catálogo de veículos com atendimento direto pelo WhatsApp." },
+      { title: "Miguel Veículos" },
+      { name: "description", content: "Miguel Veículos — revenda de carros novos e seminovos com atendimento direto pelo WhatsApp." },
       { name: "author", content: "Miguel Veículos" },
-      { property: "og:title", content: "Miguel Veículos | Catálogo" },
-      { property: "og:description", content: "Catálogo de veículos com atendimento direto pelo WhatsApp." },
+      { property: "og:site_name", content: "Miguel Veículos" },
+      { property: "og:title", content: "Miguel Veículos" },
+      { property: "og:description", content: "Revenda de carros novos e seminovos com atendimento direto pelo WhatsApp." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Miguel Veículos | Catálogo" },
-      { name: "twitter:description", content: "Catálogo de veículos com atendimento direto pelo WhatsApp." },
+      { name: "twitter:title", content: "Miguel Veículos" },
+      { name: "twitter:description", content: "Revenda de carros novos e seminovos com atendimento direto pelo WhatsApp." },
     ],
     links: [
       {
@@ -104,8 +105,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: logoUrl,
       },
     ],
-    scripts: [],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "Miguel Veículos",
+          url: "https://miguelveiculosfsa.com",
+        }),
+      },
+    ],
   }),
+
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
