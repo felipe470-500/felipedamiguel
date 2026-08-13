@@ -47,22 +47,43 @@ export const Route = createFileRoute("/")({
 
     return {
       meta: [
-        { title: "Miguel Veículos | Catálogo de veículos" },
+        { title: "Carros novos e seminovos | Miguel Veículos" },
         {
           name: "description",
           content:
-            "Miguel Veículos — catálogo de veículos novos e seminovos. Atendimento personalizado com nossa equipe pelo WhatsApp.",
+            "Catálogo de carros novos e seminovos da Miguel Veículos: filtre por marca, ano e preço e fale direto com um vendedor pelo WhatsApp.",
         },
-        { property: "og:title", content: "Miguel Veículos | Catálogo" },
+        { property: "og:title", content: "Catálogo de carros novos e seminovos — Miguel Veículos" },
         {
           property: "og:description",
-          content: "Veículos selecionados e atendimento direto pelo WhatsApp com a equipe Miguel Veículos.",
+          content:
+            "Veja os veículos disponíveis, filtre por marca, ano e preço e fale com um vendedor da Miguel Veículos pelo WhatsApp.",
         },
         { property: "og:type", content: "website" },
+        { property: "og:url", content: "https://miguelveiculosfsa.com/" },
       ],
-      links: preloadLinks as any[],
+      links: [
+        { rel: "canonical", href: "https://miguelveiculosfsa.com/" },
+        ...(preloadLinks as any[]),
+      ],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "AutoDealer",
+            name: "Miguel Veículos",
+            url: "https://miguelveiculosfsa.com/",
+            description:
+              "Revenda de carros novos e seminovos com mais de 30 anos de experiência e atendimento pelo WhatsApp.",
+            image: "https://miguelveiculosfsa.com/assets/logo-1ZDEmsV4.jpg",
+            areaServed: "Formosa, GO",
+          }),
+        },
+      ],
     };
   },
+
   component: Landing,
 });
 
@@ -447,12 +468,13 @@ function Landing() {
             Mais de 30 anos realizando sonhos com transparência e confiança
           </span>
           <h1 className="mt-4 text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl">
-            O carro certo,
+            Carros novos e seminovos em Formosa
             <br />
             <span className="bg-[image:var(--gradient-accent)] bg-clip-text text-transparent">
-              com quem entende.
+              Miguel Veículos
             </span>
           </h1>
+
           <p className="mt-4 max-w-xl text-base text-muted-foreground sm:text-lg">
             Veículos novos e seminovos selecionados, aprovação rápida e condições especiais.
             Fale direto com nossa equipe pelo WhatsApp e leve o seu hoje mesmo.
@@ -493,8 +515,9 @@ function Landing() {
           <div className="mb-8 grid grid-cols-1 gap-4 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)] sm:grid-cols-4">
             {/* Busca */}
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Busca</span>
+              <label htmlFor="filtro-busca" className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Busca</label>
               <input
+                id="filtro-busca"
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -505,8 +528,9 @@ function Landing() {
             
             {/* Marca */}
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Marca</span>
+              <label htmlFor="filtro-marca" className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Marca</label>
               <select
+                id="filtro-marca"
                 value={selectedBrand}
                 onChange={(e) => setSelectedBrand(e.target.value)}
                 className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring text-foreground"
@@ -522,8 +546,9 @@ function Landing() {
  
             {/* Ano */}
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Ano</span>
+              <label htmlFor="filtro-ano" className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Ano</label>
               <select
+                id="filtro-ano"
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(e.target.value)}
                 className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring text-foreground"
@@ -539,12 +564,13 @@ function Landing() {
  
             {/* Preço */}
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Preço máximo</span>
+              <label htmlFor="filtro-preco" className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Preço máximo</label>
               <div className="relative">
                 <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
                   R$
                 </span>
                 <input
+                  id="filtro-preco"
                   type="text"
                   inputMode="numeric"
                   value={maxPrice !== "" ? Number(maxPrice).toLocaleString("pt-BR") : ""}
@@ -558,6 +584,7 @@ function Landing() {
                 />
               </div>
             </div>
+
             
             {/* Limpar Filtros */}
             {(search || selectedBrand || selectedYear || maxPrice !== "") && (
