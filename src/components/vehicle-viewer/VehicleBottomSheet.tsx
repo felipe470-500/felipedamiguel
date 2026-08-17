@@ -55,7 +55,7 @@ export const VehicleBottomSheet: React.FC<VehicleBottomSheetProps> = ({
           {vehicle.name}
         </h1>
         <div className="text-3xl font-extrabold text-white tracking-tight">
-          R$ {vehicle.price}
+          {/^\s*R\$/i.test(vehicle.price) ? vehicle.price : `R$ ${vehicle.price}`}
         </div>
       </div>
 
