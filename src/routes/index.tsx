@@ -40,7 +40,7 @@ export const Route = createFileRoute("/")({
         return {
           rel: "preload",
           as: "image",
-          href: `/api/public/vehicle-image?path=${encodeURIComponent(cover)}`,
+          href: mediaUrl(cover),
         };
       })
       .filter(Boolean);
@@ -192,7 +192,7 @@ function Landing() {
           // Download sequencial com 400ms de intervalo para manter a conexão livre
           await new Promise((r) => setTimeout(r, 400));
           const img = new Image();
-          img.src = `/api/public/vehicle-image?path=${encodeURIComponent(cover)}`;
+          img.src = mediaUrl(cover);
         }
       };
       preloadSequence();
@@ -399,7 +399,7 @@ function Landing() {
             key={v.id}
             rel="preload"
             as="image"
-            href={`/api/public/vehicle-image?path=${encodeURIComponent(cover)}`}
+            href={mediaUrl(cover)}
           />
         );
       })}
