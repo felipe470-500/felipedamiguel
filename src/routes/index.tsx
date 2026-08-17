@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { MessageCircle, MapPin, ShieldCheck, CreditCard, Clock, Lock, Share2, PlayCircle } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
 import logo from "@/assets/logo.jpg";
-import { type Vehicle, isVideoUrl } from "@/lib/vehicles-store";
+import { type Vehicle, isVideoUrl, mediaUrl } from "@/lib/vehicles-store";
 import { listVehiclesFn } from "@/lib/vehicles.functions";
 import { getSiteSettingsFn, listSellerProfilesFn } from "@/lib/settings.functions";
 import { LeadGate, hasPassedLeadGate } from "@/components/LeadGate";
