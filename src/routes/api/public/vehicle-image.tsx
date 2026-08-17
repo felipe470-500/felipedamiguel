@@ -69,14 +69,29 @@ export const Route = createFileRoute("/api/public/vehicle-image")({
           return new Response("Not found", { status: 404 });
         }
 
-        // IMAGENS: 302 com cache permanente no browser e na CDN Edge (Cloudflare/Vercel) para velocidade de sub-50ms
+        // IMAGENS: fazemos proxy dos bytes. Antes devolvíamos um 302 com cache
+        // "immutable" de 1 ano apontando para uma signed URL de 24h — depois de
+        // expirar, o browser continuava usando o redirect em cache e a foto
+        // quebrava. Servindo os bytes, o cache longo é seguro.
         if (!video) {
-          return new Response(null, {
-            status: 302,
-            headers: {
-              location: signedUrl,
-              "cache-control": "public, max-age=31536000, s-maxage=31536000, immutable",
-            },
+          const upstreamImg = await fetch(signedUrl);
+          if (!upstreamImg.ok || !upstreamImg.body) {
+            return new Response("Not found", { status: 404 });
+          }
+          const imgHeaders = new Headers();
+          imgHeaders.set(
+            "content-type",
+            upstreamImg.headers.get("content-type") || "image/webp"
+          );
+          const len = upstreamImg.headers.get("content-length");
+          if (len) imgHeaders.set("content-length", len);
+          imgHeaders.set(
+            "cache-control",
+            "public, max-age=31536000, s-maxage=31536000, immutable"
+          );
+          return new Response(upstreamImg.body, {
+            status: 200,
+            headers: imgHeaders,
           });
         }
 
