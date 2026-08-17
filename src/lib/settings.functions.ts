@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 
-export const getSiteSettingsFn = createServerFn({ method: "GET" }).handler(async () => {
+export const getSiteSettingsFn = createServerFn({ method: "POST" }).handler(async () => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data, error } = await supabaseAdmin
     .from("site_settings")
@@ -69,7 +69,7 @@ export const listLeadsFn = createServerFn({ method: "POST" })
     return rows ?? [];
   });
 
-export const listSellerProfilesFn = createServerFn({ method: "GET" }).handler(async () => {
+export const listSellerProfilesFn = createServerFn({ method: "POST" }).handler(async () => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data, error } = await supabaseAdmin
     .from("seller_profiles")
