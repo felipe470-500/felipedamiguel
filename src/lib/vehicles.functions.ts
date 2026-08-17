@@ -15,7 +15,7 @@ const VehicleInput = z.object({
 });
 
 
-export const listVehiclesFn = createServerFn({ method: "GET" }).handler(async () => {
+export const listVehiclesFn = createServerFn({ method: "POST" }).handler(async () => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   let res = await supabaseAdmin
     .from("vehicles")
