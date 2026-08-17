@@ -93,3 +93,23 @@ export const ADMIN_SELLER_NAME_KEY = "fdm_admin_seller_name";
 
 
 
+
+/**
+ * Monta a URL final da mídia.
+ * Os valores salvos no banco já vêm como `/api/public/vehicle-image?path=...`
+ * (ou data:/http:). Só envolvemos no proxy quando for um nome de arquivo puro,
+ * evitando duplicar o prefixo dentro do próprio parâmetro `path`.
+ */
+export function mediaUrl(src: string | null | undefined): string {
+  if (!src) return "";
+  if (
+    src.startsWith("/api/") ||
+    src.startsWith("http://") ||
+    src.startsWith("https://") ||
+    src.startsWith("data:") ||
+    src.startsWith("blob:")
+  ) {
+    return src;
+  }
+  return `/api/public/vehicle-image?path=${encodeURIComponent(src)}`;
+}

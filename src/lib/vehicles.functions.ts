@@ -14,6 +14,7 @@ const VehicleInput = z.object({
   description: z.string().nullable().optional(),
 });
 
+
 export const listVehiclesFn = createServerFn({ method: "GET" }).handler(async () => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   let res = await supabaseAdmin
@@ -76,6 +77,7 @@ export const saveVehiclesFn = createServerFn({ method: "POST" })
     const { assertAdminPassword } = await import("@/lib/admin-auth.server");
     assertAdminPassword(data.password);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { normalizeMedia } = await import("@/lib/media-normalize.server");
 
     // Preserva os IDs existentes (links compartilhados continuam válidos) e
     // só remove os veículos ausentes DEPOIS que a gravação der certo.
@@ -89,7 +91,7 @@ export const saveVehiclesFn = createServerFn({ method: "POST" })
         km: v.km ?? "",
         price: v.price ?? "",
         tag: v.tag ?? null,
-        images: v.images ?? [],
+        images: (v.images ?? []).map(normalizeMedia),
         plate: v.plate ?? null,
         description: v.description ?? null,
         position: i,
