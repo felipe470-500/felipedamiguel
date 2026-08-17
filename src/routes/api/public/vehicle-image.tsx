@@ -29,12 +29,29 @@ async function getSignedUrlCached(
     return cached.url;
   }
 
-  const { data, error } = await supabaseAdmin.storage
-    .from("vehicle-images")
-    .createSignedUrl(safePath, ttl, transform ? { transform } : undefined);
+  // A assinatura pode falhar esporadicamente (503) quando várias fotos são
+  // pedidas ao mesmo tempo no primeiro carregamento. Tentamos novamente com
+  // um pequeno backoff antes de desistir.
+  let data: { signedUrl?: string } | null = null;
+  let lastError: any = null;
+  const delays = [120, 350];
+  for (let attempt = 0; attempt <= delays.length; attempt++) {
+    const res = await supabaseAdmin.storage
+      .from("vehicle-images")
+      .createSignedUrl(safePath, ttl, transform ? { transform } : undefined);
+    if (!res.error && res.data?.signedUrl) {
+      data = res.data;
+      lastError = null;
+      break;
+    }
+    lastError = res.error;
+    if (attempt < delays.length) {
+      await new Promise((r) => setTimeout(r, delays[attempt]));
+    }
+  }
 
-  if (error || !data?.signedUrl) {
-    throw new Error("Failed to sign URL: " + (error?.message || "Not found"));
+  if (!data?.signedUrl) {
+    throw new Error("Failed to sign URL: " + (lastError?.message || "Not found"));
   }
 
   urlCache.set(cacheKey, {
