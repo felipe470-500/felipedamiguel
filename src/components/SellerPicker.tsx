@@ -4,6 +4,12 @@ import { trackEvent, type TrackingParams } from "@/lib/analytics";
 import { mediaUrl } from "@/lib/vehicles-store";
 import { MediaImg } from "@/components/vehicle-viewer/MediaFallback";
 import andersonAvatar from "@/assets/anderson-miguel.jpg.asset.json";
+import miguelAvatar from "@/assets/miguel.jpg.asset.json";
+
+const LOCAL_AVATARS: Record<string, string> = {
+  anderson: andersonAvatar.url,
+  miguel: miguelAvatar.url,
+};
 
 
 
