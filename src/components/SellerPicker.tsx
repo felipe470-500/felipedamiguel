@@ -80,11 +80,7 @@ export function SellerPickerDialog({
           {SELLERS.map((s) => {
             const stored = profiles?.[s.id] ?? null;
             const avatarUrl =
-              s.id === "anderson"
-                ? andersonAvatar.url
-                : stored
-                  ? mediaUrl(stored)
-                  : null;
+              LOCAL_AVATARS[s.id] ?? (stored ? mediaUrl(stored) : null);
             return (
               <li key={s.id}>
                 <button
