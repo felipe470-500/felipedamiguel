@@ -718,6 +718,24 @@ function Landing() {
         </div>
       </footer>
 
+      {/* Botão flutuante de WhatsApp */}
+      {!picker && !detailVehicle && (!gateRequired || gatePassed) && (
+        <button
+          onClick={() =>
+            openPicker(
+              "floating_button",
+              "Olá! Gostaria de falar sobre os veículos disponíveis na Miguel Veículos.",
+              { vehicle_name: "Botão flutuante" }
+            )
+          }
+          aria-label="Falar no WhatsApp"
+          title="Falar no WhatsApp"
+          className="fixed bottom-5 right-5 z-50 grid h-14 w-14 place-items-center rounded-full bg-whatsapp text-whatsapp-foreground shadow-[0_4px_14px_rgba(37,211,102,0.35)] transition-transform hover:scale-110 active:scale-95 sm:bottom-6 sm:right-6"
+        >
+          <span className="absolute inset-0 rounded-full bg-whatsapp/40 animate-ping" aria-hidden />
+          <MessageCircle className="relative h-7 w-7 fill-current" />
+        </button>
+      )}
     </main>
   );
 }
