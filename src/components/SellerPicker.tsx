@@ -83,10 +83,10 @@ export function SellerPickerDialog({
                 >
                   <div className="flex items-center gap-3">
                     {avatarUrl ? (
-                      <img
+                      <MediaImg
                         src={avatarUrl}
                         alt={s.name}
-                        loading="lazy"
+                        decoding="async"
                         className="h-9 w-9 rounded-full object-cover border border-border bg-muted"
                       />
                     ) : (
