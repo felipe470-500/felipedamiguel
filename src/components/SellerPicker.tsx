@@ -4,6 +4,12 @@ import { trackEvent, type TrackingParams } from "@/lib/analytics";
 import { mediaUrl } from "@/lib/vehicles-store";
 import { MediaImg } from "@/components/vehicle-viewer/MediaFallback";
 import andersonAvatar from "@/assets/anderson-miguel.jpg.asset.json";
+import miguelAvatar from "@/assets/miguel.jpg.asset.json";
+
+const LOCAL_AVATARS: Record<string, string> = {
+  anderson: andersonAvatar.url,
+  miguel: miguelAvatar.url,
+};
 
 
 
@@ -74,11 +80,7 @@ export function SellerPickerDialog({
           {SELLERS.map((s) => {
             const stored = profiles?.[s.id] ?? null;
             const avatarUrl =
-              s.id === "anderson"
-                ? andersonAvatar.url
-                : stored
-                  ? mediaUrl(stored)
-                  : null;
+              LOCAL_AVATARS[s.id] ?? (stored ? mediaUrl(stored) : null);
             return (
               <li key={s.id}>
                 <button
