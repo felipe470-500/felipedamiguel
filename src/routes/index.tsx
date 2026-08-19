@@ -730,9 +730,9 @@ function Landing() {
           }
           aria-label="Falar no WhatsApp"
           title="Falar no WhatsApp"
-          className="fixed bottom-5 right-5 z-50 grid h-14 w-14 place-items-center rounded-full bg-whatsapp text-whatsapp-foreground shadow-[0_4px_14px_rgba(37,211,102,0.35)] transition-transform hover:scale-110 active:scale-95 sm:bottom-6 sm:right-6"
+          className="fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom))] right-5 z-50 grid h-14 w-14 place-items-center rounded-full bg-whatsapp text-whatsapp-foreground shadow-[0_4px_14px_rgba(37,211,102,0.35)] transition-transform hover:scale-110 active:scale-95 sm:bottom-[calc(1.5rem+env(safe-area-inset-bottom))] sm:right-6"
         >
-          <span className="absolute inset-0 rounded-full bg-whatsapp/40 animate-ping" aria-hidden />
+          <span className="pointer-events-none absolute inset-0 rounded-full bg-whatsapp/40 animate-ping" aria-hidden />
           <MessageCircle className="relative h-7 w-7 fill-current" />
         </button>
       )}
