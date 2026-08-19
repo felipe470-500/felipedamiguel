@@ -72,9 +72,13 @@ export function SellerPickerDialog({
 
         <ul className="mt-4 space-y-2">
           {SELLERS.map((s) => {
-            const rawAvatar =
-              s.id === "anderson" ? andersonAvatar.url : profiles?.[s.id] ?? null;
-            const avatarUrl = rawAvatar ? mediaUrl(rawAvatar) : null;
+            const stored = profiles?.[s.id] ?? null;
+            const avatarUrl =
+              s.id === "anderson"
+                ? andersonAvatar.url
+                : stored
+                  ? mediaUrl(stored)
+                  : null;
             return (
               <li key={s.id}>
                 <button
