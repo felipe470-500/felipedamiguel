@@ -1,6 +1,8 @@
 import { MessageCircle, X } from "lucide-react";
 import { SELLERS, formatSellerPhone, whatsappLink, type Seller } from "@/lib/sellers";
 import { trackEvent, type TrackingParams } from "@/lib/analytics";
+import { mediaUrl } from "@/lib/vehicles-store";
+import { MediaImg } from "@/components/vehicle-viewer/MediaFallback";
 import andersonAvatar from "@/assets/anderson-miguel.jpg.asset.json";
 
 
@@ -70,10 +72,13 @@ export function SellerPickerDialog({
 
         <ul className="mt-4 space-y-2">
           {SELLERS.map((s) => {
+            const stored = profiles?.[s.id] ?? null;
             const avatarUrl =
               s.id === "anderson"
                 ? andersonAvatar.url
-                : profiles?.[s.id] ?? null;
+                : stored
+                  ? mediaUrl(stored)
+                  : null;
             return (
               <li key={s.id}>
                 <button
@@ -82,10 +87,10 @@ export function SellerPickerDialog({
                 >
                   <div className="flex items-center gap-3">
                     {avatarUrl ? (
-                      <img
+                      <MediaImg
                         src={avatarUrl}
                         alt={s.name}
-                        loading="lazy"
+                        decoding="async"
                         className="h-9 w-9 rounded-full object-cover border border-border bg-muted"
                       />
                     ) : (
