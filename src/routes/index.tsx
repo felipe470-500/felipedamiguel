@@ -665,11 +665,11 @@ function Landing() {
             {visibleCount < filteredVehicles.length && (
               <div className="mt-8 flex flex-col items-center justify-center gap-3">
                 <button
-                  onClick={() => setVisibleCount((prev) => Math.min(prev + 5, filteredVehicles.length))}
+                  onClick={() => setVisibleCount((prev) => Math.min(prev + 18, filteredVehicles.length))}
                   className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-5 py-3 text-xs font-semibold text-foreground shadow-sm hover:bg-accent transition-all active:scale-95"
                 >
                   <span className="h-2 w-2 rounded-full bg-primary animate-ping" />
-                  Carregar mais 5 veículos ({visibleCount} de {filteredVehicles.length})
+                  Carregar mais 18 veículos ({visibleCount} de {filteredVehicles.length})
                 </button>
               </div>
             )}
