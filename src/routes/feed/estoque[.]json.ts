@@ -107,7 +107,13 @@ function buildVersao(name: string, entry: Entry | undefined, tag: string | null)
   if (entry) rest = rest.replace(entry.re, " ").replace(/\s+/g, " ").trim();
   const extra = (tag ?? "").trim();
   const joined = [rest, extra].filter(Boolean).join(" ").replace(/\s+/g, " ").trim();
-  return joined.replace(/^[,\-–]+|[,\-–]+$/g, "").trim();
+  // Evita repetição quando o nome e a tag trazem a mesma palavra ("Cross Cross, 1.6")
+  const words = joined.split(" ");
+  const dedup = words.filter((w, i) => {
+    const prev = words[i - 1];
+    return !prev || prev.replace(/[,.]$/, "").toLowerCase() !== w.replace(/[,.]$/, "").toLowerCase();
+  });
+  return dedup.join(" ").replace(/^[,\-–]+|[,\-–]+$/g, "").trim();
 }
 
 function parseValor(price: string): number | undefined {
