@@ -152,8 +152,11 @@ function photoUrl(src: string): string | undefined {
   if (src.startsWith("data:") || src.startsWith("blob:")) return undefined;
   if (VIDEO_RE.test(src)) return undefined;
   if (src.startsWith("http://") || src.startsWith("https://")) return src;
-  if (src.startsWith("/api/")) return `${FEED_ORIGIN}${src}`;
-  return `${FEED_ORIGIN}/api/public/vehicle-image?path=${encodeURIComponent(src)}`;
+  if (src.startsWith("/api/")) {
+    const separator = src.includes("?") ? "&" : "?";
+    return `${FEED_ORIGIN}${src}${separator}format=jpg`;
+  }
+  return `${FEED_ORIGIN}/api/public/vehicle-image?path=${encodeURIComponent(src)}&format=jpg`;
 }
 
 export const Route = createFileRoute("/feed/estoque.json")({
