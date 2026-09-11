@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FeedEstoqueDotjsonRouteImport } from './routes/feed/estoque[.]json'
 import { Route as ApiPublicVehicleImageRouteImport } from './routes/api/public/vehicle-image'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -29,6 +30,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FeedEstoqueDotjsonRoute = FeedEstoqueDotjsonRouteImport.update({
+  id: '/feed/estoque.json',
+  path: '/feed/estoque.json',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicVehicleImageRoute = ApiPublicVehicleImageRouteImport.update({
   id: '/api/public/vehicle-image',
   path: '/api/public/vehicle-image',
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/feed/estoque.json': typeof FeedEstoqueDotjsonRoute
   '/api/public/vehicle-image': typeof ApiPublicVehicleImageRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/feed/estoque.json': typeof FeedEstoqueDotjsonRoute
   '/api/public/vehicle-image': typeof ApiPublicVehicleImageRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,38 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/feed/estoque.json': typeof FeedEstoqueDotjsonRoute
   '/api/public/vehicle-image': typeof ApiPublicVehicleImageRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/sitemap.xml' | '/api/public/vehicle-image'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/sitemap.xml'
+    | '/feed/estoque.json'
+    | '/api/public/vehicle-image'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/sitemap.xml' | '/api/public/vehicle-image'
-  id: '__root__' | '/' | '/admin' | '/sitemap.xml' | '/api/public/vehicle-image'
+  to:
+    | '/'
+    | '/admin'
+    | '/sitemap.xml'
+    | '/feed/estoque.json'
+    | '/api/public/vehicle-image'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/sitemap.xml'
+    | '/feed/estoque.json'
+    | '/api/public/vehicle-image'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  FeedEstoqueDotjsonRoute: typeof FeedEstoqueDotjsonRoute
   ApiPublicVehicleImageRoute: typeof ApiPublicVehicleImageRoute
 }
 
@@ -92,6 +118,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/feed/estoque.json': {
+      id: '/feed/estoque.json'
+      path: '/feed/estoque.json'
+      fullPath: '/feed/estoque.json'
+      preLoaderRoute: typeof FeedEstoqueDotjsonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/vehicle-image': {
       id: '/api/public/vehicle-image'
       path: '/api/public/vehicle-image'
@@ -106,6 +139,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  FeedEstoqueDotjsonRoute: FeedEstoqueDotjsonRoute,
   ApiPublicVehicleImageRoute: ApiPublicVehicleImageRoute,
 }
 export const routeTree = rootRouteImport
