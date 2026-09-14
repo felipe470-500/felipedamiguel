@@ -6,9 +6,8 @@ import heroBg from "@/assets/hero-bg.jpg";
 import logo from "@/assets/logo.jpg";
 import { type Vehicle, isVideoUrl, mediaUrl } from "@/lib/vehicles-store";
 import { listVehiclesFn } from "@/lib/vehicles.functions";
-import { getSiteSettingsFn, listSellerProfilesFn } from "@/lib/settings.functions";
+import { getSiteSettingsFn } from "@/lib/settings.functions";
 import { LeadGate, hasPassedLeadGate } from "@/components/LeadGate";
-import { SellerPickerDialog } from "@/components/SellerPicker";
 import { ImageViewer } from "@/components/vehicle-viewer/ImageViewer";
 import { MediaImg, MediaVideo } from "@/components/vehicle-viewer/MediaFallback";
 import { buildVehicleShareUrl } from "@/lib/canonical-url";
@@ -105,7 +104,6 @@ function Landing() {
   const [loading, setLoading] = useState<boolean>(() => vehicles.length === 0);
   const [gateRequired, setGateRequired] = useState(false);
   const [gatePassed, setGatePassed] = useState(true);
-  const [picker, setPicker] = useState<{ source: string; message?: string; extraParams?: TrackingParams } | null>(null);
   const [detailVehicle, setDetailVehicle] = useState<Vehicle | null>(null);
  
   const [search, setSearch] = useState("");
@@ -118,8 +116,6 @@ function Landing() {
 
   const listVehicles = useServerFn(listVehiclesFn);
   const getSettings = useServerFn(getSiteSettingsFn);
-  const listSellerProfiles = useServerFn(listSellerProfilesFn);
-  const [profiles, setProfiles] = useState<Record<string, string | null>>({});
 
   useEffect(() => {
     let alive = true;
@@ -216,27 +212,13 @@ function Landing() {
     };
   }, [getSettings]);
  
-  useEffect(() => {
-    listSellerProfiles()
-      .then((rows) => {
-        const mapping: Record<string, string | null> = {};
-        rows.forEach((r) => {
-          mapping[r.seller_id] = r.avatar_url;
-        });
-        setProfiles(mapping);
-      })
-      .catch((err) => console.error("[profiles] load failed", err));
-  }, [listSellerProfiles]);
-
-  function openPicker(source: string, message?: string, extraParams?: TrackingParams) {
+  function openWhatsApp(source: string, message?: string, extraParams?: TrackingParams) {
     trackWhatsAppClick({ source, ...extraParams });
-    setPicker({ source, message, extraParams });
-  }
-
-  function trackFloatingWhatsApp() {
-    const params = { source: "floating_button", vehicle_name: "Botão flutuante" };
-    trackEvent("Contact", params);
-    trackEvent("Lead", params);
+    trackEvent("Lead", { source, ...extraParams });
+    const text = message ?? "Olá! Gostaria de falar sobre os veículos disponíveis na Miguel Veículos.";
+    const url = `https://wa.me/556182106951?text=${encodeURIComponent(text)}`;
+    const win = window.open(url, "_blank", "noopener,noreferrer");
+    if (!win) window.location.href = url;
   }
 
 
@@ -420,22 +402,12 @@ function Landing() {
         </div>
       )}
 
-      <SellerPickerDialog
-        open={!!picker}
-        onClose={() => setPicker(null)}
-        source={picker?.source ?? ""}
-        message={picker?.message}
-        profiles={profiles}
-        extraParams={picker?.extraParams}
-      />
-
-
       {detailVehicle && (
         <ImageViewer
           vehicle={detailVehicle}
           onClose={closeDetail}
           onContact={() =>
-            openPicker(
+            openWhatsApp(
               "detail_dialog",
               `Olá! Tenho interesse no ${detailVehicle.name} (${detailVehicle.year}) — ${detailVehicle.price}.`,
               {
@@ -512,7 +484,7 @@ function Landing() {
             </h2>
           </div>
           <p className="hidden text-sm text-muted-foreground sm:block">
-            Toque em um modelo e escolha o vendedor no WhatsApp
+            Toque em um modelo e fale direto com nossa equipe no WhatsApp
           </p>
         </div>
  
@@ -624,7 +596,7 @@ function Landing() {
               WhatsApp para opções sob medida.
             </p>
             <button
-              onClick={() => openPicker("empty_catalog", undefined, { vehicle_name: "Catálogo vazio" })}
+              onClick={() => openWhatsApp("empty_catalog", undefined, { vehicle_name: "Catálogo vazio" })}
               className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-whatsapp px-5 py-3 text-sm font-semibold text-whatsapp-foreground"
             >
               <MessageCircle className="h-4 w-4" />
@@ -658,7 +630,7 @@ function Landing() {
                   vehicle={v}
                   onClick={() => openDetail(v)}
                   onContact={() =>
-                    openPicker("vehicle_card", `Olá! Tenho interesse no ${v.name} (${v.year}) — ${v.price}.`, {
+                    openWhatsApp("vehicle_card", `Olá! Tenho interesse no ${v.name} (${v.year}) — ${v.price}.`, {
                       vehicle_name: v.name,
                       vehicle_year: v.year,
                       vehicle_price: v.price,
@@ -694,7 +666,7 @@ function Landing() {
             preço e condições sob medida.
           </p>
           <button
-            onClick={() => openPicker("cta_final", undefined, { vehicle_name: "Contato geral" })}
+            onClick={() => openWhatsApp("cta_final", undefined, { vehicle_name: "Contato geral" })}
             className="mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-whatsapp px-6 py-4 text-base font-semibold text-whatsapp-foreground shadow-[var(--shadow-card)] transition-transform active:scale-[0.98]"
           >
             <MessageCircle className="h-5 w-5" />
@@ -725,19 +697,16 @@ function Landing() {
       </footer>
 
       {/* Botão flutuante de WhatsApp */}
-      {!picker && !detailVehicle && (!gateRequired || gatePassed) && (
-        <a
-          href={`https://wa.me/556182106951?text=${encodeURIComponent("Olá! Gostaria de falar sobre os veículos disponíveis na Miguel Veículos.")}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={trackFloatingWhatsApp}
+      {!detailVehicle && (!gateRequired || gatePassed) && (
+        <button
+          onClick={() => openWhatsApp("floating_button", undefined, { vehicle_name: "Botão flutuante" })}
           aria-label="Falar no WhatsApp"
           title="Falar no WhatsApp"
           className="fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom))] right-5 z-50 grid h-14 w-14 place-items-center rounded-full bg-whatsapp text-whatsapp-foreground shadow-[0_4px_14px_rgba(37,211,102,0.35)] transition-transform hover:scale-110 active:scale-95 sm:bottom-[calc(1.5rem+env(safe-area-inset-bottom))] sm:right-6"
         >
           <span className="pointer-events-none absolute inset-0 rounded-full bg-whatsapp/40 animate-ping" aria-hidden />
           <MessageCircle className="relative h-7 w-7 fill-current" />
-        </a>
+        </button>
       )}
     </main>
   );
