@@ -484,7 +484,7 @@ function Landing() {
             </h2>
           </div>
           <p className="hidden text-sm text-muted-foreground sm:block">
-            Toque em um modelo e escolha o vendedor no WhatsApp
+            Toque em um modelo e fale direto com nossa equipe no WhatsApp
           </p>
         </div>
  
