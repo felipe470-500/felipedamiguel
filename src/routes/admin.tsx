@@ -187,6 +187,9 @@ function Editor({
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
+  // Só validamos os veículos realmente criados/editados agora; o estoque
+  // antigo ainda incompleto não pode bloquear um cadastro novo.
+  const [dirtyIds, setDirtyIds] = useState<Set<string>>(new Set());
  
   const listVehicles = useServerFn(listVehiclesFn);
   const saveVehicles = useServerFn(saveVehiclesFn);
