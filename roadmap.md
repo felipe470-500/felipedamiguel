@@ -20,5 +20,8 @@
 - [x] Cadastrar token APIPLACAS_TOKEN (usuário) e testar botão Buscar dados pela placa.
 - [ ] Ajustar cadastro de veículos: placa obrigatória, headline e resumo gerados automaticamente após consulta de placa, nome não editável manualmente.
 - [ ] Substituir campo de opcionais por checkboxes organizados por categoria no cadastro de veículos.
+- [ ] Corrigir filtro de busca: campo Marca deve filtrar por marca (alimentado pelo estoque) e separar de busca geral por modelo.
+- [ ] Remover bloco superior duplicado do cadastro (Nome, Tags, Ano, KM, Preço) e iniciar cadastro pela Placa.
+
 
 
