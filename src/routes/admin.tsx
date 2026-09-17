@@ -19,6 +19,8 @@ import {
   TRANSMISSION_OPTIONS,
   BODY_OPTIONS,
   STATUS_OPTIONS,
+  OPTIONAL_FEATURES_BY_CATEGORY,
+  type OptionalFeatureCategory,
 } from "@/lib/vehicles-store";
 import { SELLERS } from "@/lib/sellers";
 import {
