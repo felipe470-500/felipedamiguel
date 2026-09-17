@@ -11,6 +11,7 @@ import {
   fileToCompressedDataURL,
   type Vehicle,
   isVideoUrl,
+  isValidPlate,
   missingRequiredFields,
   generateVehicleHeadline,
   generateVehicleSummary,
