@@ -661,35 +661,51 @@ function VehicleRow({
   const [plateMsg, setPlateMsg] = useState("");
   const lookupPlate = useServerFn(lookupVehicleByPlateFn);
 
+  function regeneratePresentation(base: Partial<Vehicle>): Partial<Vehicle> {
+    const merged = { ...vehicle, ...base };
+    const headline = generateVehicleHeadline(merged);
+    const summary =
+      merged.description ||
+      generateVehicleSummary(merged) ||
+      vehicle.description ||
+      "";
+    return {
+      ...base,
+      name: headline,
+      description: summary,
+    };
+  }
+
   async function handlePlateLookup() {
     const plate = (vehicle.plate ?? "").trim();
     if (!plate) {
       setPlateMsg("Digite a placa primeiro.");
       return;
     }
+    if (!isValidPlate(plate)) {
+      setPlateMsg("Placa inválida. Use o formato AAA9A99 ou AAA9999.");
+      return;
+    }
     setPlateLoading(true);
     setPlateMsg("");
     try {
       const found = await lookupPlate({ data: { password: getAdminPassword(), plate } });
-      const patch: Partial<Vehicle> = { plate: found.plate };
-      if (found.brand) patch.brand = found.brand;
-      if (found.model) patch.model = found.model;
-      if (found.version) patch.version = found.version;
+      const basePatch: Partial<Vehicle> = { plate: found.plate };
+      if (found.brand) basePatch.brand = found.brand;
+      if (found.model) basePatch.model = found.model;
+      if (found.version) basePatch.version = found.version;
       if (found.manufactureYear) {
-        patch.manufactureYear = found.manufactureYear;
-        patch.year = found.modelYear
+        basePatch.manufactureYear = found.manufactureYear;
+        basePatch.year = found.modelYear
           ? `${found.manufactureYear}/${found.modelYear}`
           : String(found.manufactureYear);
       }
-      if (found.modelYear) patch.modelYear = found.modelYear;
-      if (found.color) patch.color = found.color;
-      if (found.fuel) patch.fuel = found.fuel;
-      if (found.vin) patch.vin = found.vin;
-      if (!vehicle.name || vehicle.name === "Novo veículo") {
-        patch.name = [found.brand, found.model, found.version].filter(Boolean).join(" ") || vehicle.name;
-      }
-      onChange(patch);
-      setPlateMsg("✅ Dados preenchidos pela placa. Confira antes de salvar.");
+      if (found.modelYear) basePatch.modelYear = found.modelYear;
+      if (found.color) basePatch.color = found.color;
+      if (found.fuel) basePatch.fuel = found.fuel;
+      if (found.vin) basePatch.vin = found.vin;
+      onChange(regeneratePresentation(basePatch));
+      setPlateMsg("✅ Dados preenchidos pela placa. Headline e resumo gerados. Confira antes de salvar.");
     } catch (err) {
       setPlateMsg(`❌ ${err instanceof Error ? err.message : String(err)}`);
     } finally {
