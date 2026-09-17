@@ -48,6 +48,56 @@ export const STATUS_OPTIONS = [
   { value: "ARCHIVED", label: "Arquivado" },
 ];
 
+export type OptionalFeatureCategory = "Conforto" | "Segurança" | "Tecnologia" | "Condução" | "Exterior";
+
+export const OPTIONAL_FEATURES_BY_CATEGORY: Record<OptionalFeatureCategory, string[]> = {
+  Conforto: [
+    "Ar-condicionado",
+    "Ar-condicionado digital",
+    "Direção hidráulica",
+    "Direção elétrica",
+    "Vidros elétricos",
+    "Travas elétricas",
+    "Alarme",
+    "Bancos de couro",
+    "Teto solar",
+  ],
+  Segurança: [
+    "Airbag duplo",
+    "Freios ABS",
+    "Controle de estabilidade",
+    "Controle de tração",
+    "Sensor de chuva",
+    "Sensor crepuscular",
+  ],
+  Tecnologia: [
+    "Central multimídia",
+    "Tela multimídia",
+    "Apple CarPlay",
+    "Android Auto",
+    "Câmera de ré",
+    "Sensor de estacionamento",
+    "Chave presencial",
+    "Partida por botão",
+  ],
+  Condução: [
+    "Câmbio automático",
+    "Câmbio automatizado",
+    "Câmbio manual",
+    "4x4",
+    "Piloto automático",
+    "Volante multifuncional",
+  ],
+  Exterior: ["Rodas de liga leve", "Faróis de neblina", "Faróis em LED"],
+};
+
+export const OPTIONAL_FEATURES_OPTIONS = Object.values(OPTIONAL_FEATURES_BY_CATEGORY).flat();
+
+export function formatOptionalFeatures(features: string[] | null | undefined): string {
+  if (!features || features.length === 0) return "";
+  return `Principais opcionais: ${features.join(", ")}.`;
+}
+
 
 
 /**
@@ -191,7 +241,8 @@ export function generateVehicleSummary(vehicle: Partial<Vehicle>): string {
       ? `R$ ${(vehicle.priceCents / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`
       : vehicle.price || "R$ 0,00";
   const year = vehicle.modelYear ? String(vehicle.modelYear) : vehicle.year || "";
-  return `Veículo ${year}${engine ? `, motor ${engine}` : ""}, na cor ${vehicle.color || ""}, com ${km} km rodados. Preço de venda: ${price}.`;
+  const optionals = formatOptionalFeatures(vehicle.optionalFeatures);
+  return `Veículo ${year}${engine ? `, motor ${engine}` : ""}, na cor ${vehicle.color || ""}, com ${km} km rodados. Preço de venda: ${price}.${optionals ? ` ${optionals}` : ""}`;
 }
 
 /** Campos obrigatórios do estoque central (valem no site e nas integrações). */

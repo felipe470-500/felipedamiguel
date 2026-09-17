@@ -19,4 +19,6 @@
 - [x] Tornar os campos obrigatórios do veículo obrigatórios também no cadastro do site (painel admin), com bloqueio e lista de pendências.
 - [x] Cadastrar token APIPLACAS_TOKEN (usuário) e testar botão Buscar dados pela placa.
 - [ ] Ajustar cadastro de veículos: placa obrigatória, headline e resumo gerados automaticamente após consulta de placa, nome não editável manualmente.
+- [ ] Substituir campo de opcionais por checkboxes organizados por categoria no cadastro de veículos.
+
 
