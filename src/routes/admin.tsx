@@ -284,6 +284,8 @@ function Editor({
       price: "R$ 0",
       images: [],
       tag: "",
+      status: "DRAFT",
+      optionalFeatures: [],
     };
     setItems((prev) => [novo, ...prev]);
   }
