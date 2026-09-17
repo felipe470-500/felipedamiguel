@@ -45,7 +45,7 @@ export const Route = createFileRoute("/api/public/integrations/mercadolivre/noti
             external_event_id: payload._id ?? null,
             // O ML não assina o corpo; a origem é validada pelo application_id da nossa app.
             signature_valid: Boolean(payload.application_id),
-            payload: payload as unknown as Record<string, unknown>,
+            payload: payload as never,
             status: "RECEIVED",
           });
         } catch {
