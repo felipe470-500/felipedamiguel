@@ -30,7 +30,7 @@ const VehicleInput = z.object({
   doors: nullableNumber,
   vin: nullableText,
   optionalFeatures: z.array(z.string()).optional(),
-  status: nullableText,
+  status: z.enum(["DRAFT","AVAILABLE","RESERVED","SOLD","ARCHIVED"]).nullable().optional(),
 });
 
 const STRUCTURED_COLUMNS =
@@ -133,7 +133,7 @@ export const saveVehiclesFn = createServerFn({ method: "POST" })
         const migrated = Boolean(v.brand || v.model || v.version || v.priceCents || v.mileageKm);
         return !v.id || migrated;
       })
-      .map((v) => ({ name: v.name, missing: missingRequiredFields(v) }))
+      .map((v) => ({ name: v.name, missing: missingRequiredFields({ ...v, id: v.id ?? undefined }) }))
       .filter((item) => item.missing.length > 0);
     if (blocked.length > 0) {
       throw new Error(
