@@ -14,4 +14,4 @@
 - [ ] Etapa 6/7: fila de sincronização, retentativas e painel de logs.
 - [x] Etapa 8: conector Mercado Livre (OAuth, publicar, atualizar, pausar, reativar, remover, qualidade e quota).
 - [ ] Cadastrar App ID e Secret Key do Mercado Livre e conectar a conta da loja.
-- [ ] Preservar e validar catálogo, fotos, leads, feed e links durante a migração.
+- [ ] Preservar e validar catálogo, fotos, leads, feed e links durante a migração.- [ ] Processar as notificações recebidas do Mercado Livre (hoje apenas registradas).
