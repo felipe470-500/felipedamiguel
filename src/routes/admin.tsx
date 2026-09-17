@@ -940,30 +940,30 @@ function VehicleRow({
             </p>
           )}
         </div>
-        <Field label="Marca" value={vehicle.brand ?? ""} onChange={(val) => onChange({ brand: val })} />
-        <Field label="Modelo" value={vehicle.model ?? ""} onChange={(val) => onChange({ model: val })} />
-        <Field label="Versão" value={vehicle.version ?? ""} onChange={(val) => onChange({ version: val })} />
+        <Field label="Marca" value={vehicle.brand ?? ""} onChange={(val) => onChange(regeneratePresentation({ brand: val }))} />
+        <Field label="Modelo" value={vehicle.model ?? ""} onChange={(val) => onChange(regeneratePresentation({ model: val }))} />
+        <Field label="Versão" value={vehicle.version ?? ""} onChange={(val) => onChange(regeneratePresentation({ version: val }))} />
         <Field
           label="Ano de fabricação"
           value={vehicle.manufactureYear ? String(vehicle.manufactureYear) : ""}
-          onChange={(val) => onChange({ manufactureYear: val ? Number(val.replace(/\D/g, "")) : null })}
+          onChange={(val) => onChange(regeneratePresentation({ manufactureYear: val ? Number(val.replace(/\D/g, "")) : null }))}
         />
         <Field
           label="Ano do modelo"
           value={vehicle.modelYear ? String(vehicle.modelYear) : ""}
-          onChange={(val) => onChange({ modelYear: val ? Number(val.replace(/\D/g, "")) : null })}
+          onChange={(val) => onChange(regeneratePresentation({ modelYear: val ? Number(val.replace(/\D/g, "")) : null }))}
         />
         <Field
           label="Quilometragem (km)"
           value={vehicle.mileageKm != null ? String(vehicle.mileageKm) : ""}
-          onChange={(val) => onChange({ mileageKm: val ? Number(val.replace(/\D/g, "")) : null })}
+          onChange={(val) => onChange(regeneratePresentation({ mileageKm: val ? Number(val.replace(/\D/g, "")) : null }))}
         />
         <Field
           label="Preço (R$)"
           value={vehicle.priceCents != null ? String(Math.round(vehicle.priceCents / 100)) : ""}
-          onChange={(val) => onChange({ priceCents: val ? Number(val.replace(/\D/g, "")) * 100 : null })}
+          onChange={(val) => onChange(regeneratePresentation({ priceCents: val ? Number(val.replace(/\D/g, "")) * 100 : null }))}
         />
-        <Field label="Cor" value={vehicle.color ?? ""} onChange={(val) => onChange({ color: val })} />
+        <Field label="Cor" value={vehicle.color ?? ""} onChange={(val) => onChange(regeneratePresentation({ color: val }))} />
         <SelectField
           label="Combustível"
           value={vehicle.fuel ?? ""}
