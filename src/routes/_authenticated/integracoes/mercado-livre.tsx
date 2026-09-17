@@ -1,13 +1,11 @@
 import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AlertTriangle, ArrowLeft, CheckCircle2, ExternalLink, Pause, Play, RefreshCw, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   changeMercadoLivreListingStatusFn,
@@ -15,7 +13,6 @@ import {
   disconnectMercadoLivreFn,
   getMercadoLivreStatusFn,
   listMercadoLivreVehiclesFn,
-  saveMercadoLivreContactFn,
   startMercadoLivreOAuthFn,
   syncVehicleToMercadoLivreFn,
 } from "@/lib/mercadolivre.functions";
@@ -50,7 +47,6 @@ function MercadoLivrePage() {
   const listVehicles = useServerFn(listMercadoLivreVehiclesFn);
   const startOAuth = useServerFn(startMercadoLivreOAuthFn);
   const disconnect = useServerFn(disconnectMercadoLivreFn);
-  const saveContact = useServerFn(saveMercadoLivreContactFn);
   const syncVehicle = useServerFn(syncVehicleToMercadoLivreFn);
   const changeStatus = useServerFn(changeMercadoLivreListingStatusFn);
   const removeListing = useServerFn(deleteMercadoLivreListingFn);
@@ -58,22 +54,8 @@ function MercadoLivrePage() {
   const status = useQuery({ queryKey: ["ml-status"], queryFn: () => getStatus({ data: {} } as never) });
   const vehicles = useQuery({ queryKey: ["ml-vehicles"], queryFn: () => listVehicles({ data: {} } as never) });
 
-  const [contact, setContact] = useState({ countryCode: "55", whatsapp: "", city: "", stateId: "BR-GO" });
   const [feedback, setFeedback] = useState<string | null>(null);
 
-  useEffect(() => {
-    const saved = status.data?.contact;
-    if (saved) setContact(saved);
-  }, [status.data?.contact]);
-
-  const contactMutation = useMutation({
-    mutationFn: () => saveContact({ data: contact }),
-    onSuccess: () => {
-      setFeedback("Dados de contato salvos.");
-      void queryClient.invalidateQueries({ queryKey: ["ml-status"] });
-    },
-    onError: (error: Error) => setFeedback(error.message),
-  });
 
   const connectMutation = useMutation({
     mutationFn: () => startOAuth({ data: {} } as never),
@@ -193,61 +175,27 @@ function MercadoLivrePage() {
       </section>
 
       <section className="mt-6 rounded-xl border border-border bg-card p-5">
-        <h2 className="text-lg font-semibold">Contato e localização da loja</h2>
+        <h2 className="text-lg font-semibold">Dados da loja usados nesta integração</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           A partir de 01/10/2026 o WhatsApp é obrigatório em toda criação e atualização de anúncio de concessionária.
+          Estes dados vêm das Configurações da loja e valem para todas as plataformas.
         </p>
-        <form
-          className="mt-4 grid gap-4 sm:grid-cols-4"
-          onSubmit={(event) => {
-            event.preventDefault();
-            contactMutation.mutate();
-          }}
-        >
-          <div>
-            <Label htmlFor="ml-country">País</Label>
-            <Input
-              id="ml-country"
-              value={contact.countryCode}
-              inputMode="numeric"
-              onChange={(event) => setContact((old) => ({ ...old, countryCode: event.target.value.replace(/\D/g, "") }))}
-            />
-          </div>
-          <div>
-            <Label htmlFor="ml-whatsapp">WhatsApp (DDD + número)</Label>
-            <Input
-              id="ml-whatsapp"
-              value={contact.whatsapp}
-              inputMode="numeric"
-              placeholder="6182106951"
-              onChange={(event) => setContact((old) => ({ ...old, whatsapp: event.target.value.replace(/\D/g, "") }))}
-            />
-          </div>
-          <div>
-            <Label htmlFor="ml-city">Cidade</Label>
-            <Input
-              id="ml-city"
-              value={contact.city}
-              placeholder="Formosa"
-              onChange={(event) => setContact((old) => ({ ...old, city: event.target.value }))}
-            />
-          </div>
-          <div>
-            <Label htmlFor="ml-state">Estado</Label>
-            <Input
-              id="ml-state"
-              value={contact.stateId}
-              placeholder="BR-GO"
-              onChange={(event) => setContact((old) => ({ ...old, stateId: event.target.value.toUpperCase() }))}
-            />
-          </div>
-          <div className="sm:col-span-4">
-            <Button type="submit" disabled={contactMutation.isPending}>
-              Salvar contato
-            </Button>
-          </div>
-        </form>
+        <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
+          <Badge variant={data?.storeReady ? "default" : "secondary"}>
+            {data?.storeReady ? "Dados da loja configurados" : "Dados da loja incompletos"}
+          </Badge>
+          {data?.contact ? (
+            <span className="text-muted-foreground">
+              +{data.contact.countryCode} {data.contact.whatsapp} · {data.contact.city}/
+              {data.contact.stateId.replace("BR-", "")}
+            </span>
+          ) : null}
+          <Button asChild size="sm" variant="outline">
+            <Link to="/configuracoes-loja">Editar dados da loja</Link>
+          </Button>
+        </div>
       </section>
+
 
       <section className="mt-6 rounded-xl border border-border bg-card p-5">
         <h2 className="text-lg font-semibold">Veículos e anúncios</h2>
@@ -257,7 +205,7 @@ function MercadoLivrePage() {
           <ul className="mt-4 divide-y divide-border">
             {(vehicles.data ?? []).map((vehicle) => (
               <li key={vehicle.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="truncate font-medium">{vehicle.name}</p>
                   <p className="text-xs text-muted-foreground">
                     {vehicle.year} · {vehicle.photos} foto(s) ·{" "}
@@ -271,6 +219,23 @@ function MercadoLivrePage() {
                     )}
                     {vehicle.listing?.last_error_message ? ` · ${vehicle.listing.last_error_message}` : ""}
                   </p>
+                  <details className="mt-1">
+                    <summary className="cursor-pointer text-xs">
+                      <Badge variant={vehicle.readiness.ready ? "default" : "secondary"}>
+                        {vehicle.readiness.ready
+                          ? "Pronto para publicação"
+                          : `Faltam ${vehicle.readiness.missing.length} item(ns)`}
+                      </Badge>
+                    </summary>
+                    <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+                      {vehicle.readiness.results.map((item) => (
+                        <li key={item.key}>
+                          {item.ok ? "✅" : "❌"} {item.label}
+                          {!item.ok && item.hint ? ` — ${item.hint}` : ""}
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
                 </div>
                 <div className="flex gap-2">
                   <Button

@@ -9,7 +9,45 @@ export type Vehicle = {
   tag?: string | null;
   plate?: string | null;
   description?: string | null;
+  /** Campos estruturados do estoque central (usados pelas integrações). */
+  brand?: string | null;
+  model?: string | null;
+  version?: string | null;
+  manufactureYear?: number | null;
+  modelYear?: number | null;
+  mileageKm?: number | null;
+  priceCents?: number | null;
+  color?: string | null;
+  fuel?: string | null;
+  transmission?: string | null;
+  bodyType?: string | null;
+  doors?: number | null;
+  vin?: string | null;
+  optionalFeatures?: string[];
+  status?: string | null;
 };
+
+export const FUEL_OPTIONS = ["Flex", "Gasolina", "Etanol", "Diesel", "GNV", "Elétrico", "Híbrido"];
+export const TRANSMISSION_OPTIONS = ["Manual", "Automático", "Automatizado", "CVT"];
+export const BODY_OPTIONS = [
+  "Hatch",
+  "Sedã",
+  "SUV",
+  "Picape",
+  "Van",
+  "Minivan",
+  "Conversível",
+  "Cupê",
+  "Perua",
+];
+export const STATUS_OPTIONS = [
+  { value: "DRAFT", label: "Rascunho" },
+  { value: "AVAILABLE", label: "Disponível" },
+  { value: "RESERVED", label: "Reservado" },
+  { value: "SOLD", label: "Vendido" },
+  { value: "ARCHIVED", label: "Arquivado" },
+];
+
 
 
 /**
@@ -112,4 +150,36 @@ export function mediaUrl(src: string | null | undefined): string {
     return src;
   }
   return `/api/public/vehicle-image?path=${encodeURIComponent(src)}`;
+}
+
+/** Campos obrigatórios do estoque central (valem no site e nas integrações). */
+export const REQUIRED_VEHICLE_FIELDS: { key: keyof Vehicle; label: string }[] = [
+  { key: "brand", label: "Marca" },
+  { key: "model", label: "Modelo" },
+  { key: "version", label: "Versão" },
+  { key: "manufactureYear", label: "Ano de fabricação" },
+  { key: "modelYear", label: "Ano do modelo" },
+  { key: "mileageKm", label: "Quilometragem" },
+  { key: "priceCents", label: "Preço" },
+  { key: "color", label: "Cor" },
+  { key: "fuel", label: "Combustível" },
+  { key: "transmission", label: "Câmbio" },
+  { key: "bodyType", label: "Carroceria" },
+  { key: "doors", label: "Número de portas" },
+  { key: "description", label: "Descrição" },
+];
+
+/**
+ * Lista o que falta para o veículo ficar pronto. Rascunhos ficam livres:
+ * só é exigido quando o veículo sai de Rascunho.
+ */
+export function missingRequiredFields(vehicle: Partial<Vehicle>): string[] {
+  if ((vehicle.status ?? "AVAILABLE") === "DRAFT") return [];
+  const missing = REQUIRED_VEHICLE_FIELDS.filter(({ key }) => {
+    const value = vehicle[key];
+    if (typeof value === "number") return !Number.isFinite(value) || value < 0;
+    return !(typeof value === "string" && value.trim().length > 0);
+  }).map(({ label }) => label);
+  if (!vehicle.images || vehicle.images.length === 0) missing.push("Pelo menos 1 foto");
+  return missing;
 }

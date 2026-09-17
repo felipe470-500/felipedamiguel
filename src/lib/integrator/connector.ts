@@ -26,7 +26,9 @@ export type CanonicalVehicle = {
   color: string | null;
   fuel: string | null;
   transmission: string | null;
+  bodyType: string | null;
   doors: number | null;
+  optionalFeatures: string[];
   description: string | null;
   plate: string | null;
   vin: string | null;

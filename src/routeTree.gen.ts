@@ -16,6 +16,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FeedEstoqueDotjsonRouteImport } from './routes/feed/estoque[.]json'
 import { Route as AuthenticatedIntegradorRouteImport } from './routes/_authenticated/integrador'
+import { Route as AuthenticatedConfiguracoesLojaRouteImport } from './routes/_authenticated/configuracoes-loja'
 import { Route as ApiPublicVehicleImageRouteImport } from './routes/api/public/vehicle-image'
 import { Route as AuthenticatedIntegracoesMercadoLivreRouteImport } from './routes/_authenticated/integracoes/mercado-livre'
 import { Route as ApiPublicIntegrationsMercadolivreNotificationsRouteImport } from './routes/api/public/integrations/mercadolivre/notifications'
@@ -55,6 +56,12 @@ const AuthenticatedIntegradorRoute = AuthenticatedIntegradorRouteImport.update({
   path: '/integrador',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedConfiguracoesLojaRoute =
+  AuthenticatedConfiguracoesLojaRouteImport.update({
+    id: '/configuracoes-loja',
+    path: '/configuracoes-loja',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicVehicleImageRoute = ApiPublicVehicleImageRouteImport.update({
   id: '/api/public/vehicle-image',
   path: '/api/public/vehicle-image',
@@ -84,6 +91,7 @@ export interface FileRoutesByFullPath {
   '/acesso': typeof AcessoRoute
   '/admin': typeof AdminRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/configuracoes-loja': typeof AuthenticatedConfiguracoesLojaRoute
   '/integrador': typeof AuthenticatedIntegradorRoute
   '/feed/estoque.json': typeof FeedEstoqueDotjsonRoute
   '/integracoes/mercado-livre': typeof AuthenticatedIntegracoesMercadoLivreRoute
@@ -96,6 +104,7 @@ export interface FileRoutesByTo {
   '/acesso': typeof AcessoRoute
   '/admin': typeof AdminRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/configuracoes-loja': typeof AuthenticatedConfiguracoesLojaRoute
   '/integrador': typeof AuthenticatedIntegradorRoute
   '/feed/estoque.json': typeof FeedEstoqueDotjsonRoute
   '/integracoes/mercado-livre': typeof AuthenticatedIntegracoesMercadoLivreRoute
@@ -110,6 +119,7 @@ export interface FileRoutesById {
   '/acesso': typeof AcessoRoute
   '/admin': typeof AdminRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/configuracoes-loja': typeof AuthenticatedConfiguracoesLojaRoute
   '/_authenticated/integrador': typeof AuthenticatedIntegradorRoute
   '/feed/estoque.json': typeof FeedEstoqueDotjsonRoute
   '/_authenticated/integracoes/mercado-livre': typeof AuthenticatedIntegracoesMercadoLivreRoute
@@ -124,6 +134,7 @@ export interface FileRouteTypes {
     | '/acesso'
     | '/admin'
     | '/sitemap.xml'
+    | '/configuracoes-loja'
     | '/integrador'
     | '/feed/estoque.json'
     | '/integracoes/mercado-livre'
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
     | '/acesso'
     | '/admin'
     | '/sitemap.xml'
+    | '/configuracoes-loja'
     | '/integrador'
     | '/feed/estoque.json'
     | '/integracoes/mercado-livre'
@@ -149,6 +161,7 @@ export interface FileRouteTypes {
     | '/acesso'
     | '/admin'
     | '/sitemap.xml'
+    | '/_authenticated/configuracoes-loja'
     | '/_authenticated/integrador'
     | '/feed/estoque.json'
     | '/_authenticated/integracoes/mercado-livre'
@@ -220,6 +233,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIntegradorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/configuracoes-loja': {
+      id: '/_authenticated/configuracoes-loja'
+      path: '/configuracoes-loja'
+      fullPath: '/configuracoes-loja'
+      preLoaderRoute: typeof AuthenticatedConfiguracoesLojaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/vehicle-image': {
       id: '/api/public/vehicle-image'
       path: '/api/public/vehicle-image'
@@ -252,11 +272,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedConfiguracoesLojaRoute: typeof AuthenticatedConfiguracoesLojaRoute
   AuthenticatedIntegradorRoute: typeof AuthenticatedIntegradorRoute
   AuthenticatedIntegracoesMercadoLivreRoute: typeof AuthenticatedIntegracoesMercadoLivreRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedConfiguracoesLojaRoute: AuthenticatedConfiguracoesLojaRoute,
   AuthenticatedIntegradorRoute: AuthenticatedIntegradorRoute,
   AuthenticatedIntegracoesMercadoLivreRoute:
     AuthenticatedIntegracoesMercadoLivreRoute,

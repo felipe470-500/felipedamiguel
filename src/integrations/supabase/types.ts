@@ -400,6 +400,80 @@ export type Database = {
           },
         ]
       }
+      store_profiles: {
+        Row: {
+          city: string | null
+          complement: string | null
+          country_code: string
+          created_at: string
+          email: string | null
+          latitude: number | null
+          legal_name: string | null
+          longitude: number | null
+          neighborhood: string | null
+          phone: string | null
+          postal_code: string | null
+          state_code: string | null
+          store_id: string
+          street: string | null
+          street_number: string | null
+          tax_id: string | null
+          trade_name: string
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          city?: string | null
+          complement?: string | null
+          country_code?: string
+          created_at?: string
+          email?: string | null
+          latitude?: number | null
+          legal_name?: string | null
+          longitude?: number | null
+          neighborhood?: string | null
+          phone?: string | null
+          postal_code?: string | null
+          state_code?: string | null
+          store_id: string
+          street?: string | null
+          street_number?: string | null
+          tax_id?: string | null
+          trade_name?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          city?: string | null
+          complement?: string | null
+          country_code?: string
+          created_at?: string
+          email?: string | null
+          latitude?: number | null
+          legal_name?: string | null
+          longitude?: number | null
+          neighborhood?: string | null
+          phone?: string | null
+          postal_code?: string | null
+          state_code?: string | null
+          store_id?: string
+          street?: string | null
+          street_number?: string | null
+          tax_id?: string | null
+          trade_name?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_profiles_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: true
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stores: {
         Row: {
           active: boolean
@@ -851,6 +925,7 @@ export type Database = {
       }
       vehicles: {
         Row: {
+          body_type: string | null
           brand: string | null
           color: string | null
           created_at: string
@@ -867,6 +942,7 @@ export type Database = {
           model: string | null
           model_year: number | null
           name: string
+          optional_features: string[]
           plate: string | null
           position: number
           price: string
@@ -879,10 +955,12 @@ export type Database = {
           transmission: string | null
           updated_at: string
           version: string | null
+          videos: string[]
           vin: string | null
           year: string
         }
         Insert: {
+          body_type?: string | null
           brand?: string | null
           color?: string | null
           created_at?: string
@@ -899,6 +977,7 @@ export type Database = {
           model?: string | null
           model_year?: number | null
           name: string
+          optional_features?: string[]
           plate?: string | null
           position?: number
           price?: string
@@ -911,10 +990,12 @@ export type Database = {
           transmission?: string | null
           updated_at?: string
           version?: string | null
+          videos?: string[]
           vin?: string | null
           year?: string
         }
         Update: {
+          body_type?: string | null
           brand?: string | null
           color?: string | null
           created_at?: string
@@ -931,6 +1012,7 @@ export type Database = {
           model?: string | null
           model_year?: number | null
           name?: string
+          optional_features?: string[]
           plate?: string | null
           position?: number
           price?: string
@@ -943,6 +1025,7 @@ export type Database = {
           transmission?: string | null
           updated_at?: string
           version?: string | null
+          videos?: string[]
           vin?: string | null
           year?: string
         }

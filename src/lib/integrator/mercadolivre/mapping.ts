@@ -1,4 +1,5 @@
 import type { CanonicalVehicle } from "@/lib/integrator/connector";
+import type { StoreProfileData } from "@/lib/integrator/validation";
 
 import { ML_CARS_CATEGORY } from "./constants";
 
@@ -48,12 +49,37 @@ const TRANSMISSION_MAP: Record<string, string> = {
   cvt: "CVT",
 };
 
+const BODY_MAP: Record<string, string> = {
+  hatch: "Hatchback",
+  hatchback: "Hatchback",
+  sedan: "Sedán",
+  suv: "SUV",
+  picape: "Pick-Up",
+  pickup: "Pick-Up",
+  perua: "Station Wagon",
+  minivan: "Minivan",
+  van: "Van",
+  conversivel: "Conversível",
+  cupe: "Coupé",
+  coupe: "Coupé",
+};
+
 function normalizeKey(value: string | null): string {
   return (value ?? "")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .trim()
     .toLowerCase();
+}
+
+/** Converte a ficha da loja no contato exigido pelo Mercado Livre. */
+export function contactFromStoreProfile(store: StoreProfileData | null): MlStoreContact | null {
+  if (!store) return null;
+  const whatsapp = (store.whatsapp ?? store.phone ?? "").replace(/\D/g, "").slice(-11);
+  const city = (store.city ?? "").trim();
+  const stateCode = (store.stateCode ?? "").trim().toUpperCase();
+  if (!/^\d{10,11}$/.test(whatsapp) || !city || !/^[A-Z]{2}$/.test(stateCode)) return null;
+  return { countryCode: "55", whatsapp, city, stateId: `BR-${stateCode}` };
 }
 
 export function buildTitle(vehicle: CanonicalVehicle, fallbackName: string): string {
@@ -63,27 +89,6 @@ export function buildTitle(vehicle: CanonicalVehicle, fallbackName: string): str
   const year = vehicle.modelYear ?? vehicle.manufactureYear;
   const title = year && !base.includes(String(year)) ? `${base} ${year}` : base;
   return title.slice(0, 60).trim();
-}
-
-/** Erros de validação que impedem a publicação — retornados antes de chamar a API. */
-export function validateForMercadoLivre(
-  vehicle: CanonicalVehicle,
-  contact: MlStoreContact | null,
-): string[] {
-  const issues: string[] = [];
-  if (!vehicle.brand) issues.push("Marca não preenchida");
-  if (!vehicle.model) issues.push("Modelo não preenchido");
-  if (!vehicle.modelYear && !vehicle.manufactureYear) issues.push("Ano não preenchido");
-  if (!vehicle.priceCents || vehicle.priceCents <= 0) issues.push("Preço não preenchido");
-  if (vehicle.photos.length === 0) issues.push("É obrigatório ter pelo menos 1 foto");
-  if (!contact) issues.push("Dados de contato e localização da loja não configurados");
-  else {
-    if (!/^\d{1,3}$/.test(contact.countryCode)) issues.push("Código do país inválido (só dígitos)");
-    if (!/^\d{10,11}$/.test(contact.whatsapp)) issues.push("WhatsApp da loja inválido (só dígitos, com DDD)");
-    if (!contact.city) issues.push("Cidade da loja não configurada");
-    if (!/^BR-[A-Z]{2}$/.test(contact.stateId)) issues.push("Estado da loja inválido (formato BR-GO)");
-  }
-  return issues;
 }
 
 export function buildItemPayload(
@@ -111,6 +116,9 @@ export function buildItemPayload(
       id: "TRANSMISSION",
       value_name: TRANSMISSION_MAP[normalizeKey(vehicle.transmission)] ?? vehicle.transmission,
     });
+  }
+  if (vehicle.bodyType) {
+    attributes.push({ id: "BODYWORK", value_name: BODY_MAP[normalizeKey(vehicle.bodyType)] ?? vehicle.bodyType });
   }
   if (vehicle.color) attributes.push({ id: "COLOR", value_name: vehicle.color });
   if (vehicle.plate) attributes.push({ id: "LICENSE_PLATE", value_name: vehicle.plate.toUpperCase() });
@@ -159,8 +167,11 @@ export function buildUpdatePayload(
 
 /** Descrição é enviada em chamada separada, sem telefone/site/endereço no corpo. */
 export function buildDescriptionText(vehicle: CanonicalVehicle, fallbackName: string): string {
-  const raw = vehicle.description?.trim() || fallbackName;
-  return raw
+  const base = vehicle.description?.trim() || fallbackName;
+  const optionals = vehicle.optionalFeatures?.length
+    ? `\n\nOpcionais: ${vehicle.optionalFeatures.join(", ")}`
+    : "";
+  return `${base}${optionals}`
     .replace(/\b\d{2}\s?\d{4,5}-?\d{4}\b/g, "")
     .replace(/https?:\/\/\S+/gi, "")
     .replace(/www\.\S+/gi, "")

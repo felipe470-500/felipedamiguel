@@ -1,6 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { missingRequiredFields } from "@/lib/vehicles-store";
 
+
+const nullableText = z.string().nullable().optional();
+const nullableNumber = z.number().nullable().optional();
 
 const VehicleInput = z.object({
   id: z.string().uuid().nullable().optional(),
@@ -12,56 +16,94 @@ const VehicleInput = z.object({
   images: z.array(z.string()).default([]),
   plate: z.string().nullable().optional(),
   description: z.string().nullable().optional(),
+  brand: nullableText,
+  model: nullableText,
+  version: nullableText,
+  manufactureYear: nullableNumber,
+  modelYear: nullableNumber,
+  mileageKm: nullableNumber,
+  priceCents: nullableNumber,
+  color: nullableText,
+  fuel: nullableText,
+  transmission: nullableText,
+  bodyType: nullableText,
+  doors: nullableNumber,
+  vin: nullableText,
+  optionalFeatures: z.array(z.string()).optional(),
+  status: nullableText,
 });
 
+const STRUCTURED_COLUMNS =
+  "brand, model, version, manufacture_year, model_year, mileage_km, price_cents, color, fuel, transmission, body_type, doors, vin, optional_features, status";
+
+
+type VehicleListItem = {
+  id: string;
+  name: string;
+  year: string;
+  km: string;
+  price: string;
+  tag: string | null;
+  images: string[];
+  position: number;
+  plate: string | null;
+  description: string | null;
+  brand: string | null;
+  model: string | null;
+  version: string | null;
+  manufactureYear: number | null;
+  modelYear: number | null;
+  mileageKm: number | null;
+  priceCents: number | null;
+  color: string | null;
+  fuel: string | null;
+  transmission: string | null;
+  bodyType: string | null;
+  doors: number | null;
+  vin: string | null;
+  optionalFeatures: string[];
+  status: string | null;
+};
 
 export const listVehiclesFn = createServerFn({ method: "POST" }).handler(async () => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  let res = await supabaseAdmin
+  const res = await supabaseAdmin
     .from("vehicles")
-    .select("id, name, year, km, price, tag, images, position, plate, description")
+    .select(`id, name, year, km, price, tag, images, position, plate, description, ${STRUCTURED_COLUMNS}`)
     .order("position", { ascending: true })
     .order("created_at", { ascending: true });
-    
-  if (res.error && (res.error.message.toLowerCase().includes("column") || res.error.message.toLowerCase().includes("description") || res.error.message.toLowerCase().includes("plate"))) {
-    const fallback = await supabaseAdmin
-      .from("vehicles")
-      .select("id, name, year, km, price, tag, images, position")
-      .order("position", { ascending: true })
-      .order("created_at", { ascending: true });
-    if (fallback.error) throw new Error(fallback.error.message);
-    
-    return (fallback.data ?? []).map((v) => ({
-      ...v,
-      plate: null,
-      description: null,
-    })) as Array<{
-      id: string;
-      name: string;
-      year: string;
-      km: string;
-      price: string;
-      tag: string | null;
-      images: string[];
-      position: number;
-      plate: string | null;
-      description: string | null;
-    }>;
-  }
-  
+
   if (res.error) throw new Error(res.error.message);
-  return (res.data ?? []) as Array<{
-    id: string;
-    name: string;
-    year: string;
-    km: string;
-    price: string;
-    tag: string | null;
-    images: string[];
-    position: number;
-    plate: string | null;
-    description: string | null;
-  }>;
+  return (res.data ?? []).map((row) => {
+    const v = row as Record<string, unknown>;
+    return {
+      id: v["id"] as string,
+      name: (v["name"] as string) ?? "",
+      year: (v["year"] as string) ?? "",
+      km: (v["km"] as string) ?? "",
+      price: (v["price"] as string) ?? "",
+      tag: (v["tag"] as string | null) ?? null,
+      images: (v["images"] as string[] | null) ?? [],
+      position: (v["position"] as number) ?? 0,
+      plate: (v["plate"] as string | null) ?? null,
+      description: (v["description"] as string | null) ?? null,
+      brand: (v["brand"] as string | null) ?? null,
+      model: (v["model"] as string | null) ?? null,
+      version: (v["version"] as string | null) ?? null,
+      manufactureYear: (v["manufacture_year"] as number | null) ?? null,
+      modelYear: (v["model_year"] as number | null) ?? null,
+      mileageKm: (v["mileage_km"] as number | null) ?? null,
+      priceCents: (v["price_cents"] as number | null) ?? null,
+      color: (v["color"] as string | null) ?? null,
+      fuel: (v["fuel"] as string | null) ?? null,
+      transmission: (v["transmission"] as string | null) ?? null,
+      bodyType: (v["body_type"] as string | null) ?? null,
+      doors: (v["doors"] as number | null) ?? null,
+      vin: (v["vin"] as string | null) ?? null,
+      optionalFeatures: (v["optional_features"] as string[] | null) ?? [],
+      status: (v["status"] as string | null) ?? null,
+    } satisfies VehicleListItem;
+  });
 });
 
 export const saveVehiclesFn = createServerFn({ method: "POST" })
@@ -83,6 +125,24 @@ export const saveVehiclesFn = createServerFn({ method: "POST" })
     // só remove os veículos ausentes DEPOIS que a gravação der certo.
     const keepIds: string[] = [];
 
+    // Bloqueio central: veículo publicado (fora de Rascunho) precisa dos campos obrigatórios.
+    // Cadastros novos e já migrados são exigidos; o estoque antigo ainda não preenchido
+    // continua salvável até ser completado (aparece como pendente nos painéis).
+    const blocked = data.vehicles
+      .filter((v) => {
+        const migrated = Boolean(v.brand || v.model || v.version || v.priceCents || v.mileageKm);
+        return !v.id || migrated;
+      })
+      .map((v) => ({ name: v.name, missing: missingRequiredFields(v) }))
+      .filter((item) => item.missing.length > 0);
+    if (blocked.length > 0) {
+      throw new Error(
+        `Este veículo não está pronto para integração. ${blocked
+          .map((item) => `${item.name || "Sem nome"}: faltam ${item.missing.join(", ")}`)
+          .join(" | ")}`,
+      );
+    }
+
     if (data.vehicles.length > 0) {
       const rows = data.vehicles.map((v, i) => ({
         ...(v.id ? { id: v.id } : {}),
@@ -95,7 +155,23 @@ export const saveVehiclesFn = createServerFn({ method: "POST" })
         plate: v.plate ?? null,
         description: v.description ?? null,
         position: i,
+        brand: v.brand ?? null,
+        model: v.model ?? null,
+        version: v.version ?? null,
+        manufacture_year: v.manufactureYear ?? null,
+        model_year: v.modelYear ?? null,
+        mileage_km: v.mileageKm ?? null,
+        price_cents: v.priceCents ?? null,
+        color: v.color ?? null,
+        fuel: v.fuel ?? null,
+        transmission: v.transmission ?? null,
+        body_type: v.bodyType ?? null,
+        doors: v.doors ?? null,
+        vin: v.vin ?? null,
+        optional_features: v.optionalFeatures ?? [],
+        status: v.status ?? "AVAILABLE",
       }));
+
 
       const existing = rows.filter((r) => "id" in r);
       const created = rows.filter((r) => !("id" in r));
