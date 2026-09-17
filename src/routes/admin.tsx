@@ -296,10 +296,11 @@ function Editor({
   function add() {
     const novo: Vehicle = {
       id: `tmp-${Date.now()}`,
-      name: "Novo veículo",
-      year: "2024",
-      km: "0 km",
-      price: "R$ 0",
+      name: "",
+      year: "",
+      km: "",
+      price: "",
+      plate: "",
       images: [],
       tag: "",
       status: "DRAFT",
