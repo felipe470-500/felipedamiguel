@@ -72,8 +72,18 @@ export const getIntegratorDashboardFn = createServerFn({ method: "GET" })
         .order("created_at", { ascending: false })
         .limit(8),
     ]);
-    const firstError = [vehicles.error, integrations.error, jobs.error, leads.error, logs.error].find(Boolean);
-    if (firstError) throw new Error(firstError.message);
+    const issues = (
+      [
+        ["vehicles", vehicles.error],
+        ["integrations", integrations.error],
+        ["jobs", jobs.error],
+        ["leads", leads.error],
+        ["logs", logs.error],
+      ] as const
+    )
+      .filter(([, error]) => Boolean(error))
+      .map(([label, error]) => `${label}: ${error?.message ?? "erro desconhecido"}`);
+    if (issues.length) console.error("[integrator-dashboard]", issues.join(" | "));
 
     const vehicleRows = vehicles.data ?? [];
     const jobRows = jobs.data ?? [];
