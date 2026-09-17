@@ -24,6 +24,7 @@ import {
   uploadVehicleImageFn,
   createVehicleUploadUrlFn,
 } from "@/lib/vehicles.functions";
+import { lookupVehicleByPlateFn } from "@/lib/plate-lookup.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 import {
