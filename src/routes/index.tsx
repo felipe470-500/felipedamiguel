@@ -507,7 +507,7 @@ function Landing() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Modelo, ano, tag..."
+                placeholder="Buscar por modelo, ano, tag..."
                 className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring text-foreground"
               />
             </div>
