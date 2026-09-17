@@ -354,7 +354,7 @@ function Landing() {
           .join(" ")
           .toLowerCase()
           .includes(q);
-      const brand = (v.brand || "").trim();
+      const brand = brandOf(v);
       const matchesBrand = !selectedBrand || brand.toLowerCase() === selectedBrand.toLowerCase();
       const yearMatch = (v.year || "").match(/\d{4}/);
       const matchesYear = !selectedYear || (yearMatch && yearMatch[0] === selectedYear);
