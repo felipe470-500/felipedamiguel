@@ -24,6 +24,7 @@ import {
   uploadVehicleImageFn,
   createVehicleUploadUrlFn,
 } from "@/lib/vehicles.functions";
+import { lookupVehicleByPlateFn } from "@/lib/plate-lookup.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 import {
@@ -212,7 +213,7 @@ function Editor({
     listVehicles()
       .then((rows) =>
         setItems(
-          rows.map((r) => ({
+           rows.map((r) => ({
             id: r.id,
             name: r.name,
             year: r.year,
@@ -222,6 +223,21 @@ function Editor({
             images: r.images ?? [],
             plate: r.plate ?? undefined,
             description: r.description ?? undefined,
+            brand: r.brand ?? undefined,
+            model: r.model ?? undefined,
+            version: r.version ?? undefined,
+            manufactureYear: r.manufactureYear ?? undefined,
+            modelYear: r.modelYear ?? undefined,
+            mileageKm: r.mileageKm ?? undefined,
+            priceCents: r.priceCents ?? undefined,
+            color: r.color ?? undefined,
+            fuel: r.fuel ?? undefined,
+            transmission: r.transmission ?? undefined,
+            bodyType: r.bodyType ?? undefined,
+            doors: r.doors ?? undefined,
+            vin: r.vin ?? undefined,
+            optionalFeatures: r.optionalFeatures ?? [],
+            status: r.status ?? undefined,
           })),
         ),
       )
@@ -627,6 +643,46 @@ function VehicleRow({
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
+  const [plateLoading, setPlateLoading] = useState(false);
+  const [plateMsg, setPlateMsg] = useState("");
+  const lookupPlate = useServerFn(lookupVehicleByPlateFn);
+
+  async function handlePlateLookup() {
+    const plate = (vehicle.plate ?? "").trim();
+    if (!plate) {
+      setPlateMsg("Digite a placa primeiro.");
+      return;
+    }
+    setPlateLoading(true);
+    setPlateMsg("");
+    try {
+      const found = await lookupPlate({ data: { password: getAdminPassword(), plate } });
+      const patch: Partial<Vehicle> = { plate: found.plate };
+      if (found.brand) patch.brand = found.brand;
+      if (found.model) patch.model = found.model;
+      if (found.version) patch.version = found.version;
+      if (found.manufactureYear) {
+        patch.manufactureYear = found.manufactureYear;
+        patch.year = found.modelYear
+          ? `${found.manufactureYear}/${found.modelYear}`
+          : String(found.manufactureYear);
+      }
+      if (found.modelYear) patch.modelYear = found.modelYear;
+      if (found.color) patch.color = found.color;
+      if (found.fuel) patch.fuel = found.fuel;
+      if (found.vin) patch.vin = found.vin;
+      if (!vehicle.name || vehicle.name === "Novo veículo") {
+        patch.name = [found.brand, found.model, found.version].filter(Boolean).join(" ") || vehicle.name;
+      }
+      onChange(patch);
+      setPlateMsg("✅ Dados preenchidos pela placa. Confira antes de salvar.");
+    } catch (err) {
+      setPlateMsg(`❌ ${err instanceof Error ? err.message : String(err)}`);
+    } finally {
+      setPlateLoading(false);
+    }
+  }
+  
  
   function handleDragEnter(targetIdx: number) {
     if (draggedIdx === null || draggedIdx === targetIdx) return;
@@ -822,7 +878,31 @@ function VehicleRow({
         <Field label="Ano" value={vehicle.year} onChange={(val) => onChange({ year: val })} />
         <Field label="KM" value={vehicle.km} onChange={(val) => onChange({ km: val })} />
         <Field label="Preço" value={vehicle.price} onChange={(val) => onChange({ price: val })} />
-        <Field label="Placa (apenas no admin)" value={vehicle.plate ?? ""} onChange={(val) => onChange({ plate: val })} />
+        <div className="sm:col-span-2">
+          <span className="mb-1 block text-xs text-muted-foreground">Placa (apenas no admin)</span>
+          <div className="flex gap-2">
+            <input
+              value={vehicle.plate ?? ""}
+              onChange={(e) => onChange({ plate: e.target.value.toUpperCase() })}
+              placeholder="AAA9A99"
+              className="w-full rounded-md border border-border bg-background px-2.5 py-2 text-sm uppercase outline-none focus:ring-1 focus:ring-ring"
+            />
+            <button
+              type="button"
+              onClick={handlePlateLookup}
+              disabled={plateLoading}
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-secondary px-3 py-2 text-xs font-semibold text-foreground hover:bg-secondary/80 disabled:opacity-60"
+            >
+              <Search className="h-3.5 w-3.5" />
+              {plateLoading ? "Buscando…" : "Buscar dados pela placa"}
+            </button>
+          </div>
+          {plateMsg && (
+            <p className={`mt-1 text-xs ${plateMsg.startsWith("✅") ? "text-primary" : "text-destructive"}`}>
+              {plateMsg}
+            </p>
+          )}
+        </div>
         <Field label="Marca" value={vehicle.brand ?? ""} onChange={(val) => onChange({ brand: val })} />
         <Field label="Modelo" value={vehicle.model ?? ""} onChange={(val) => onChange({ model: val })} />
         <Field label="Versão" value={vehicle.version ?? ""} onChange={(val) => onChange({ version: val })} />
