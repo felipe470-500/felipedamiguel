@@ -667,13 +667,25 @@ function VehicleRow({
     const merged = { ...vehicle, ...base };
     const headline = generateVehicleHeadline(merged);
     const summary =
-      merged.description ||
+      (base.description === "" ? "" : merged.description) ||
       generateVehicleSummary(merged) ||
-      vehicle.description ||
       "";
+    const yearParts = [merged.manufactureYear, merged.modelYear].filter(Number.isFinite);
+    const year = yearParts.length > 0 ? yearParts.join("/") : merged.year || "";
+    const km =
+      merged.mileageKm != null && Number.isFinite(merged.mileageKm)
+        ? merged.mileageKm.toLocaleString("pt-BR")
+        : merged.km || "";
+    const price =
+      merged.priceCents != null && Number.isFinite(merged.priceCents)
+        ? `R$ ${(merged.priceCents / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`
+        : merged.price || "";
     return {
       ...base,
       name: headline,
+      year,
+      km,
+      price,
       description: summary,
     };
   }
