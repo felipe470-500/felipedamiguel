@@ -427,6 +427,14 @@ function Landing() {
           <div className="flex items-center gap-2">
             <img src={logo} alt="Miguel Veículos" className="h-10 w-auto rounded-lg object-contain" />
           </div>
+          <Link
+            to="/acesso"
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-medium text-foreground transition-colors hover:bg-accent sm:text-sm"
+          >
+            <LayoutDashboard className="h-4 w-4" />
+            <span className="hidden sm:inline">Área do Integrador</span>
+            <span className="sm:hidden">Integrador</span>
+          </Link>
         </div>
       </header>
 
