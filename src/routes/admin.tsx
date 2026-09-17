@@ -371,9 +371,11 @@ function Editor({
             vin: v.vin ?? null,
             optionalFeatures: v.optionalFeatures ?? [],
             status: v.status ?? "AVAILABLE",
+            validate: isEdited(v),
           })),
         },
       });
+      setDirtyIds(new Set());
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } catch (e) {
