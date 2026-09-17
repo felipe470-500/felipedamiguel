@@ -913,10 +913,6 @@ function VehicleRow({
             )}
           </div>
         </div>
-        <Field label="Tag (opcional)" value={vehicle.tag ?? ""} onChange={(val) => onChange({ tag: val })} />
-        <Field label="Ano" value={vehicle.year} onChange={(val) => onChange(regeneratePresentation({ year: val }))} />
-        <Field label="KM" value={vehicle.km} onChange={(val) => onChange(regeneratePresentation({ km: val }))} />
-        <Field label="Preço" value={vehicle.price} onChange={(val) => onChange(regeneratePresentation({ price: val }))} />
         <div className="sm:col-span-2">
           <span className="mb-1 block text-xs text-muted-foreground">Placa (apenas no admin)</span>
           <div className="flex gap-2">
