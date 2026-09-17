@@ -878,7 +878,31 @@ function VehicleRow({
         <Field label="Ano" value={vehicle.year} onChange={(val) => onChange({ year: val })} />
         <Field label="KM" value={vehicle.km} onChange={(val) => onChange({ km: val })} />
         <Field label="Preço" value={vehicle.price} onChange={(val) => onChange({ price: val })} />
-        <Field label="Placa (apenas no admin)" value={vehicle.plate ?? ""} onChange={(val) => onChange({ plate: val })} />
+        <div className="sm:col-span-2">
+          <span className="mb-1 block text-xs text-muted-foreground">Placa (apenas no admin)</span>
+          <div className="flex gap-2">
+            <input
+              value={vehicle.plate ?? ""}
+              onChange={(e) => onChange({ plate: e.target.value.toUpperCase() })}
+              placeholder="AAA9A99"
+              className="w-full rounded-md border border-border bg-background px-2.5 py-2 text-sm uppercase outline-none focus:ring-1 focus:ring-ring"
+            />
+            <button
+              type="button"
+              onClick={handlePlateLookup}
+              disabled={plateLoading}
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-secondary px-3 py-2 text-xs font-semibold text-foreground hover:bg-secondary/80 disabled:opacity-60"
+            >
+              <Search className="h-3.5 w-3.5" />
+              {plateLoading ? "Buscando…" : "Buscar dados pela placa"}
+            </button>
+          </div>
+          {plateMsg && (
+            <p className={`mt-1 text-xs ${plateMsg.startsWith("✅") ? "text-primary" : "text-destructive"}`}>
+              {plateMsg}
+            </p>
+          )}
+        </div>
         <Field label="Marca" value={vehicle.brand ?? ""} onChange={(val) => onChange({ brand: val })} />
         <Field label="Modelo" value={vehicle.model ?? ""} onChange={(val) => onChange({ model: val })} />
         <Field label="Versão" value={vehicle.version ?? ""} onChange={(val) => onChange({ version: val })} />
