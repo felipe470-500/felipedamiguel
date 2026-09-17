@@ -643,6 +643,46 @@ function VehicleRow({
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
+  const [plateLoading, setPlateLoading] = useState(false);
+  const [plateMsg, setPlateMsg] = useState("");
+  const lookupPlate = useServerFn(lookupVehicleByPlateFn);
+
+  async function handlePlateLookup() {
+    const plate = (vehicle.plate ?? "").trim();
+    if (!plate) {
+      setPlateMsg("Digite a placa primeiro.");
+      return;
+    }
+    setPlateLoading(true);
+    setPlateMsg("");
+    try {
+      const found = await lookupPlate({ data: { password: getAdminPassword(), plate } });
+      const patch: Partial<Vehicle> = { plate: found.plate };
+      if (found.brand) patch.brand = found.brand;
+      if (found.model) patch.model = found.model;
+      if (found.version) patch.version = found.version;
+      if (found.manufactureYear) {
+        patch.manufactureYear = found.manufactureYear;
+        patch.year = found.modelYear
+          ? `${found.manufactureYear}/${found.modelYear}`
+          : String(found.manufactureYear);
+      }
+      if (found.modelYear) patch.modelYear = found.modelYear;
+      if (found.color) patch.color = found.color;
+      if (found.fuel) patch.fuel = found.fuel;
+      if (found.vin) patch.vin = found.vin;
+      if (!vehicle.name || vehicle.name === "Novo veículo") {
+        patch.name = [found.brand, found.model, found.version].filter(Boolean).join(" ") || vehicle.name;
+      }
+      onChange(patch);
+      setPlateMsg("✅ Dados preenchidos pela placa. Confira antes de salvar.");
+    } catch (err) {
+      setPlateMsg(`❌ ${err instanceof Error ? err.message : String(err)}`);
+    } finally {
+      setPlateLoading(false);
+    }
+  }
+  
  
   function handleDragEnter(targetIdx: number) {
     if (draggedIdx === null || draggedIdx === targetIdx) return;
