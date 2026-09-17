@@ -303,7 +303,7 @@ function Landing() {
       Array.from(
         new Set(
           vehicles
-            .map((v) => (v.name || "").trim().split(" ")[0])
+            .map((v) => (v.brand || "").trim())
             .filter((b) => b && b.length > 1),
         ),
       ).sort(),
