@@ -4,6 +4,13 @@
 - [x] Investigar o ano do Toyota Corolla GLi sem alterar sem confirmação.
 - [x] Investigar o km bruto do Renault Duster 2014 sem alterar sem confirmação.
 - [x] Listar todos os veículos com km nulo ou zero, com marca, modelo e id.
-- [ ] Aprovar a arquitetura do integrador automotivo multiloja.
-- [ ] Implementar a fase 1: motor do integrador e conector Mercado Livre.
+- [x] Aprovar a arquitetura do integrador automotivo multiloja.
+- [x] Etapa 1: base de empresas, lojas, papéis e isolamento por loja.
+- [x] Etapa 1b: acesso da equipe (Google e e-mail) e painel inicial do integrador.
+- [x] Etapa 4 (base): cofre criptografado de credenciais de integração.
+- [x] Etapa 5 (base): contrato padrão dos conectores e operações.
+- [ ] Etapa 2: migrar o estoque atual para o modelo canônico de veículo.
+- [ ] Etapa 3: serviços de domínio e API privada v1.
+- [ ] Etapa 6/7: fila de sincronização, retentativas e painel de logs.
+- [ ] Etapa 8: conector Mercado Livre (OAuth e operações confirmadas).
 - [ ] Preservar e validar catálogo, fotos, leads, feed e links durante a migração.
