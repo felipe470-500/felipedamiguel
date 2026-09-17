@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, memo } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { MessageCircle, MapPin, ShieldCheck, CreditCard, Clock, Lock, Share2, PlayCircle } from "lucide-react";
+import { MessageCircle, MapPin, ShieldCheck, CreditCard, Clock, Lock, Share2, PlayCircle, LayoutDashboard } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
 import logo from "@/assets/logo.jpg";
 import { type Vehicle, isVideoUrl, mediaUrl } from "@/lib/vehicles-store";
