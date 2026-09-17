@@ -12,6 +12,8 @@ import {
   type Vehicle,
   isVideoUrl,
   missingRequiredFields,
+  generateVehicleHeadline,
+  generateVehicleSummary,
   FUEL_OPTIONS,
   TRANSMISSION_OPTIONS,
   BODY_OPTIONS,
