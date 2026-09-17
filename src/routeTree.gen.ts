@@ -11,8 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AcessoRouteImport } from './routes/acesso'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FeedEstoqueDotjsonRouteImport } from './routes/feed/estoque[.]json'
+import { Route as AuthenticatedIntegradorRouteImport } from './routes/_authenticated/integrador'
 import { Route as ApiPublicVehicleImageRouteImport } from './routes/api/public/vehicle-image'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -25,6 +28,15 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AcessoRoute = AcessoRouteImport.update({
+  id: '/acesso',
+  path: '/acesso',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -35,6 +47,11 @@ const FeedEstoqueDotjsonRoute = FeedEstoqueDotjsonRouteImport.update({
   path: '/feed/estoque.json',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedIntegradorRoute = AuthenticatedIntegradorRouteImport.update({
+  id: '/integrador',
+  path: '/integrador',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ApiPublicVehicleImageRoute = ApiPublicVehicleImageRouteImport.update({
   id: '/api/public/vehicle-image',
   path: '/api/public/vehicle-image',
@@ -43,23 +60,30 @@ const ApiPublicVehicleImageRoute = ApiPublicVehicleImageRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/acesso': typeof AcessoRoute
   '/admin': typeof AdminRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/integrador': typeof AuthenticatedIntegradorRoute
   '/feed/estoque.json': typeof FeedEstoqueDotjsonRoute
   '/api/public/vehicle-image': typeof ApiPublicVehicleImageRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/acesso': typeof AcessoRoute
   '/admin': typeof AdminRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/integrador': typeof AuthenticatedIntegradorRoute
   '/feed/estoque.json': typeof FeedEstoqueDotjsonRoute
   '/api/public/vehicle-image': typeof ApiPublicVehicleImageRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/acesso': typeof AcessoRoute
   '/admin': typeof AdminRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/integrador': typeof AuthenticatedIntegradorRoute
   '/feed/estoque.json': typeof FeedEstoqueDotjsonRoute
   '/api/public/vehicle-image': typeof ApiPublicVehicleImageRoute
 }
@@ -67,28 +91,37 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/acesso'
     | '/admin'
     | '/sitemap.xml'
+    | '/integrador'
     | '/feed/estoque.json'
     | '/api/public/vehicle-image'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/acesso'
     | '/admin'
     | '/sitemap.xml'
+    | '/integrador'
     | '/feed/estoque.json'
     | '/api/public/vehicle-image'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
+    | '/acesso'
     | '/admin'
     | '/sitemap.xml'
+    | '/_authenticated/integrador'
     | '/feed/estoque.json'
     | '/api/public/vehicle-image'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AcessoRoute: typeof AcessoRoute
   AdminRoute: typeof AdminRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   FeedEstoqueDotjsonRoute: typeof FeedEstoqueDotjsonRoute
@@ -111,6 +144,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/acesso': {
+      id: '/acesso'
+      path: '/acesso'
+      fullPath: '/acesso'
+      preLoaderRoute: typeof AcessoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -125,6 +172,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeedEstoqueDotjsonRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/integrador': {
+      id: '/_authenticated/integrador'
+      path: '/integrador'
+      fullPath: '/integrador'
+      preLoaderRoute: typeof AuthenticatedIntegradorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/vehicle-image': {
       id: '/api/public/vehicle-image'
       path: '/api/public/vehicle-image'
@@ -135,8 +189,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedIntegradorRoute: typeof AuthenticatedIntegradorRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedIntegradorRoute: AuthenticatedIntegradorRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AcessoRoute: AcessoRoute,
   AdminRoute: AdminRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   FeedEstoqueDotjsonRoute: FeedEstoqueDotjsonRoute,
