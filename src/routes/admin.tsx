@@ -291,6 +291,7 @@ function Editor({
   }
 
   function update(id: string, patch: Partial<Vehicle>) {
+    setDirtyIds((prev) => (prev.has(id) ? prev : new Set(prev).add(id)));
     setItems((prev) => prev.map((v) => (v.id === id ? { ...v, ...patch } : v)));
   }
   function remove(id: string) {
