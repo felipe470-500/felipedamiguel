@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as FeedEstoqueDotjsonRouteImport } from './routes/feed/estoque[.]json'
 import { Route as AuthenticatedIntegradorRouteImport } from './routes/_authenticated/integrador'
 import { Route as ApiPublicVehicleImageRouteImport } from './routes/api/public/vehicle-image'
+import { Route as ApiPublicIntegrationsMercadolivreCallbackRouteImport } from './routes/api/public/integrations/mercadolivre/callback'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -57,6 +58,12 @@ const ApiPublicVehicleImageRoute = ApiPublicVehicleImageRouteImport.update({
   path: '/api/public/vehicle-image',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicIntegrationsMercadolivreCallbackRoute =
+  ApiPublicIntegrationsMercadolivreCallbackRouteImport.update({
+    id: '/api/public/integrations/mercadolivre/callback',
+    path: '/api/public/integrations/mercadolivre/callback',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByFullPath {
   '/integrador': typeof AuthenticatedIntegradorRoute
   '/feed/estoque.json': typeof FeedEstoqueDotjsonRoute
   '/api/public/vehicle-image': typeof ApiPublicVehicleImageRoute
+  '/api/public/integrations/mercadolivre/callback': typeof ApiPublicIntegrationsMercadolivreCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -75,6 +83,7 @@ export interface FileRoutesByTo {
   '/integrador': typeof AuthenticatedIntegradorRoute
   '/feed/estoque.json': typeof FeedEstoqueDotjsonRoute
   '/api/public/vehicle-image': typeof ApiPublicVehicleImageRoute
+  '/api/public/integrations/mercadolivre/callback': typeof ApiPublicIntegrationsMercadolivreCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -86,6 +95,7 @@ export interface FileRoutesById {
   '/_authenticated/integrador': typeof AuthenticatedIntegradorRoute
   '/feed/estoque.json': typeof FeedEstoqueDotjsonRoute
   '/api/public/vehicle-image': typeof ApiPublicVehicleImageRoute
+  '/api/public/integrations/mercadolivre/callback': typeof ApiPublicIntegrationsMercadolivreCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/integrador'
     | '/feed/estoque.json'
     | '/api/public/vehicle-image'
+    | '/api/public/integrations/mercadolivre/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/integrador'
     | '/feed/estoque.json'
     | '/api/public/vehicle-image'
+    | '/api/public/integrations/mercadolivre/callback'
   id:
     | '__root__'
     | '/'
@@ -116,6 +128,7 @@ export interface FileRouteTypes {
     | '/_authenticated/integrador'
     | '/feed/estoque.json'
     | '/api/public/vehicle-image'
+    | '/api/public/integrations/mercadolivre/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -126,6 +139,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   FeedEstoqueDotjsonRoute: typeof FeedEstoqueDotjsonRoute
   ApiPublicVehicleImageRoute: typeof ApiPublicVehicleImageRoute
+  ApiPublicIntegrationsMercadolivreCallbackRoute: typeof ApiPublicIntegrationsMercadolivreCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -186,6 +200,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicVehicleImageRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/integrations/mercadolivre/callback': {
+      id: '/api/public/integrations/mercadolivre/callback'
+      path: '/api/public/integrations/mercadolivre/callback'
+      fullPath: '/api/public/integrations/mercadolivre/callback'
+      preLoaderRoute: typeof ApiPublicIntegrationsMercadolivreCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -208,6 +229,8 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   FeedEstoqueDotjsonRoute: FeedEstoqueDotjsonRoute,
   ApiPublicVehicleImageRoute: ApiPublicVehicleImageRoute,
+  ApiPublicIntegrationsMercadolivreCallbackRoute:
+    ApiPublicIntegrationsMercadolivreCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
