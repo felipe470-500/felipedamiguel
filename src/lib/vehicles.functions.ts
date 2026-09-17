@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { missingRequiredFields } from "@/lib/vehicles-store";
+import { isValidPlate, missingRequiredFields } from "@/lib/vehicles-store";
 
 
 const nullableText = z.string().nullable().optional();
@@ -125,9 +125,19 @@ export const saveVehiclesFn = createServerFn({ method: "POST" })
     // só remove os veículos ausentes DEPOIS que a gravação der certo.
     const keepIds: string[] = [];
 
-    // Bloqueio central: veículo publicado (fora de Rascunho) precisa dos campos obrigatórios.
-    // Cadastros novos e já migrados são exigidos; o estoque antigo ainda não preenchido
-    // continua salvável até ser completado (aparece como pendente nos painéis).
+    // Bloqueio central: placa válida é obrigatória para todo veículo; demais campos
+    // obrigatórios só são exigidos fora do status DRAFT. Cadastros novos e já migrados
+    // são validados; o estoque antigo ainda não preenchido continua salvável até ser
+    // completado (aparece como pendente nos painéis).
+    const invalidPlate = data.vehicles
+      .filter((v) => !isValidPlate(v.plate))
+      .map((v) => v.name || "Sem nome");
+    if (invalidPlate.length > 0) {
+      throw new Error(
+        `Placa inválida ou ausente: ${invalidPlate.join(", ")}. Informe uma placa válida e consulte os dados antes de salvar.`,
+      );
+    }
+
     const blocked = data.vehicles
       .filter((v) => {
         const migrated = Boolean(v.brand || v.model || v.version || v.priceCents || v.mileageKm);

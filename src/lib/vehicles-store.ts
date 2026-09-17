@@ -152,8 +152,51 @@ export function mediaUrl(src: string | null | undefined): string {
   return `/api/public/vehicle-image?path=${encodeURIComponent(src)}`;
 }
 
+export function isValidPlate(plate: string | null | undefined): boolean {
+  if (!plate) return false;
+  const clean = plate.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+  return /^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/.test(clean) || /^[A-Z]{3}[0-9]{4}$/.test(clean);
+}
+
+/** Extrai motorização da versão (ex: "1.0 Turbo" → "1.0", "2.0" → "2.0"). */
+export function extractEngine(version: string | null | undefined): string | null {
+  if (!version) return null;
+  const match = version.match(/\b\d(?:\.\d{1,2})?\b/);
+  return match ? match[0] : null;
+}
+
+/** Monta a headline comercial: Marca + Modelo + Motorização + Ano/Modelo + Cor. */
+export function generateVehicleHeadline(vehicle: Partial<Vehicle>): string {
+  const engine = extractEngine(vehicle.version);
+  const year = vehicle.modelYear ? String(vehicle.modelYear) : vehicle.year;
+  const parts = [
+    vehicle.brand,
+    vehicle.model,
+    engine,
+    year,
+    vehicle.color,
+  ].filter(Boolean);
+  return parts.join(" ") || vehicle.name || "";
+}
+
+/** Monta o resumo comercial do veículo. */
+export function generateVehicleSummary(vehicle: Partial<Vehicle>): string {
+  const engine = extractEngine(vehicle.version);
+  const km =
+    vehicle.mileageKm != null && Number.isFinite(vehicle.mileageKm)
+      ? vehicle.mileageKm.toLocaleString("pt-BR")
+      : vehicle.km || "0";
+  const price =
+    vehicle.priceCents != null && Number.isFinite(vehicle.priceCents)
+      ? `R$ ${(vehicle.priceCents / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`
+      : vehicle.price || "R$ 0,00";
+  const year = vehicle.modelYear ? String(vehicle.modelYear) : vehicle.year || "";
+  return `Veículo ${year}${engine ? `, motor ${engine}` : ""}, na cor ${vehicle.color || ""}, com ${km} km rodados. Preço de venda: ${price}.`;
+}
+
 /** Campos obrigatórios do estoque central (valem no site e nas integrações). */
 export const REQUIRED_VEHICLE_FIELDS: { key: keyof Vehicle; label: string }[] = [
+  { key: "plate", label: "Placa" },
   { key: "brand", label: "Marca" },
   { key: "model", label: "Modelo" },
   { key: "version", label: "Versão" },
@@ -170,16 +213,20 @@ export const REQUIRED_VEHICLE_FIELDS: { key: keyof Vehicle; label: string }[] = 
 ];
 
 /**
- * Lista o que falta para o veículo ficar pronto. Rascunhos ficam livres:
- * só é exigido quando o veículo sai de Rascunho.
+ * Lista o que falta para o veículo ficar pronto. A placa é obrigatória
+ * mesmo em rascunhos; os demais campos só são exigidos fora do status DRAFT.
  */
 export function missingRequiredFields(vehicle: Partial<Vehicle>): string[] {
-  if ((vehicle.status ?? "AVAILABLE") === "DRAFT") return [];
-  const missing = REQUIRED_VEHICLE_FIELDS.filter(({ key }) => {
-    const value = vehicle[key];
-    if (typeof value === "number") return !Number.isFinite(value) || value < 0;
-    return !(typeof value === "string" && value.trim().length > 0);
-  }).map(({ label }) => label);
+  const missing: string[] = [];
+  if (!isValidPlate(vehicle.plate)) missing.push("Placa válida");
+  if ((vehicle.status ?? "AVAILABLE") === "DRAFT") return missing;
+  missing.push(
+    ...REQUIRED_VEHICLE_FIELDS.filter(({ key }) => key !== "plate").filter(({ key }) => {
+      const value = vehicle[key];
+      if (typeof value === "number") return !Number.isFinite(value) || value < 0;
+      return !(typeof value === "string" && value.trim().length > 0);
+    }).map(({ label }) => label),
+  );
   if (!vehicle.images || vehicle.images.length === 0) missing.push("Pelo menos 1 foto");
   return missing;
 }

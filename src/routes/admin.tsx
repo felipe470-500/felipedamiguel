@@ -11,7 +11,10 @@ import {
   fileToCompressedDataURL,
   type Vehicle,
   isVideoUrl,
+  isValidPlate,
   missingRequiredFields,
+  generateVehicleHeadline,
+  generateVehicleSummary,
   FUEL_OPTIONS,
   TRANSMISSION_OPTIONS,
   BODY_OPTIONS,
@@ -294,10 +297,11 @@ function Editor({
   function add() {
     const novo: Vehicle = {
       id: `tmp-${Date.now()}`,
-      name: "Novo veículo",
-      year: "2024",
-      km: "0 km",
-      price: "R$ 0",
+      name: "",
+      year: "",
+      km: "",
+      price: "",
+      plate: "",
       images: [],
       tag: "",
       status: "DRAFT",
@@ -306,6 +310,16 @@ function Editor({
     setItems((prev) => [novo, ...prev]);
   }
   async function persist() {
+    const invalidPlate = items
+      .filter((v) => !isValidPlate(v.plate))
+      .map((v) => v.name || "Sem nome");
+    if (invalidPlate.length > 0) {
+      setErrorMsg(
+        `Placa inválida ou ausente em: ${invalidPlate.join(", ")}. Informe a placa e consulte os dados antes de salvar.`,
+      );
+      return;
+    }
+
     const incomplete = items
       .filter(
         (v) =>
@@ -647,35 +661,51 @@ function VehicleRow({
   const [plateMsg, setPlateMsg] = useState("");
   const lookupPlate = useServerFn(lookupVehicleByPlateFn);
 
+  function regeneratePresentation(base: Partial<Vehicle>): Partial<Vehicle> {
+    const merged = { ...vehicle, ...base };
+    const headline = generateVehicleHeadline(merged);
+    const summary =
+      merged.description ||
+      generateVehicleSummary(merged) ||
+      vehicle.description ||
+      "";
+    return {
+      ...base,
+      name: headline,
+      description: summary,
+    };
+  }
+
   async function handlePlateLookup() {
     const plate = (vehicle.plate ?? "").trim();
     if (!plate) {
       setPlateMsg("Digite a placa primeiro.");
       return;
     }
+    if (!isValidPlate(plate)) {
+      setPlateMsg("Placa inválida. Use o formato AAA9A99 ou AAA9999.");
+      return;
+    }
     setPlateLoading(true);
     setPlateMsg("");
     try {
       const found = await lookupPlate({ data: { password: getAdminPassword(), plate } });
-      const patch: Partial<Vehicle> = { plate: found.plate };
-      if (found.brand) patch.brand = found.brand;
-      if (found.model) patch.model = found.model;
-      if (found.version) patch.version = found.version;
+      const basePatch: Partial<Vehicle> = { plate: found.plate };
+      if (found.brand) basePatch.brand = found.brand;
+      if (found.model) basePatch.model = found.model;
+      if (found.version) basePatch.version = found.version;
       if (found.manufactureYear) {
-        patch.manufactureYear = found.manufactureYear;
-        patch.year = found.modelYear
+        basePatch.manufactureYear = found.manufactureYear;
+        basePatch.year = found.modelYear
           ? `${found.manufactureYear}/${found.modelYear}`
           : String(found.manufactureYear);
       }
-      if (found.modelYear) patch.modelYear = found.modelYear;
-      if (found.color) patch.color = found.color;
-      if (found.fuel) patch.fuel = found.fuel;
-      if (found.vin) patch.vin = found.vin;
-      if (!vehicle.name || vehicle.name === "Novo veículo") {
-        patch.name = [found.brand, found.model, found.version].filter(Boolean).join(" ") || vehicle.name;
-      }
-      onChange(patch);
-      setPlateMsg("✅ Dados preenchidos pela placa. Confira antes de salvar.");
+      if (found.modelYear) basePatch.modelYear = found.modelYear;
+      if (found.color) basePatch.color = found.color;
+      if (found.fuel) basePatch.fuel = found.fuel;
+      if (found.vin) basePatch.vin = found.vin;
+      onChange(regeneratePresentation(basePatch));
+      setPlateMsg("✅ Dados preenchidos pela placa. Headline e resumo gerados. Confira antes de salvar.");
     } catch (err) {
       setPlateMsg(`❌ ${err instanceof Error ? err.message : String(err)}`);
     } finally {
@@ -873,11 +903,18 @@ function VehicleRow({
       {uploadError && <p className="mt-2 text-xs text-destructive">{uploadError}</p>}
 
       <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
-        <Field label="Nome" value={vehicle.name} onChange={(val) => onChange({ name: val })} />
+        <div className="sm:col-span-2">
+          <span className="mb-1 block text-xs text-muted-foreground">Headline (gerada automaticamente após a consulta da placa)</span>
+          <div className="w-full rounded-md border border-border bg-muted px-2.5 py-2 text-sm text-foreground">
+            {vehicle.name || (
+              <span className="text-muted-foreground">Informe a placa e consulte para gerar a headline</span>
+            )}
+          </div>
+        </div>
         <Field label="Tag (opcional)" value={vehicle.tag ?? ""} onChange={(val) => onChange({ tag: val })} />
-        <Field label="Ano" value={vehicle.year} onChange={(val) => onChange({ year: val })} />
-        <Field label="KM" value={vehicle.km} onChange={(val) => onChange({ km: val })} />
-        <Field label="Preço" value={vehicle.price} onChange={(val) => onChange({ price: val })} />
+        <Field label="Ano" value={vehicle.year} onChange={(val) => onChange(regeneratePresentation({ year: val }))} />
+        <Field label="KM" value={vehicle.km} onChange={(val) => onChange(regeneratePresentation({ km: val }))} />
+        <Field label="Preço" value={vehicle.price} onChange={(val) => onChange(regeneratePresentation({ price: val }))} />
         <div className="sm:col-span-2">
           <span className="mb-1 block text-xs text-muted-foreground">Placa (apenas no admin)</span>
           <div className="flex gap-2">
@@ -894,7 +931,7 @@ function VehicleRow({
               className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-secondary px-3 py-2 text-xs font-semibold text-foreground hover:bg-secondary/80 disabled:opacity-60"
             >
               <Search className="h-3.5 w-3.5" />
-              {plateLoading ? "Buscando…" : "Buscar dados pela placa"}
+              {plateLoading ? "Consultando…" : "Consultar placa"}
             </button>
           </div>
           {plateMsg && (
@@ -903,30 +940,30 @@ function VehicleRow({
             </p>
           )}
         </div>
-        <Field label="Marca" value={vehicle.brand ?? ""} onChange={(val) => onChange({ brand: val })} />
-        <Field label="Modelo" value={vehicle.model ?? ""} onChange={(val) => onChange({ model: val })} />
-        <Field label="Versão" value={vehicle.version ?? ""} onChange={(val) => onChange({ version: val })} />
+        <Field label="Marca" value={vehicle.brand ?? ""} onChange={(val) => onChange(regeneratePresentation({ brand: val }))} />
+        <Field label="Modelo" value={vehicle.model ?? ""} onChange={(val) => onChange(regeneratePresentation({ model: val }))} />
+        <Field label="Versão" value={vehicle.version ?? ""} onChange={(val) => onChange(regeneratePresentation({ version: val }))} />
         <Field
           label="Ano de fabricação"
           value={vehicle.manufactureYear ? String(vehicle.manufactureYear) : ""}
-          onChange={(val) => onChange({ manufactureYear: val ? Number(val.replace(/\D/g, "")) : null })}
+          onChange={(val) => onChange(regeneratePresentation({ manufactureYear: val ? Number(val.replace(/\D/g, "")) : null }))}
         />
         <Field
           label="Ano do modelo"
           value={vehicle.modelYear ? String(vehicle.modelYear) : ""}
-          onChange={(val) => onChange({ modelYear: val ? Number(val.replace(/\D/g, "")) : null })}
+          onChange={(val) => onChange(regeneratePresentation({ modelYear: val ? Number(val.replace(/\D/g, "")) : null }))}
         />
         <Field
           label="Quilometragem (km)"
           value={vehicle.mileageKm != null ? String(vehicle.mileageKm) : ""}
-          onChange={(val) => onChange({ mileageKm: val ? Number(val.replace(/\D/g, "")) : null })}
+          onChange={(val) => onChange(regeneratePresentation({ mileageKm: val ? Number(val.replace(/\D/g, "")) : null }))}
         />
         <Field
           label="Preço (R$)"
           value={vehicle.priceCents != null ? String(Math.round(vehicle.priceCents / 100)) : ""}
-          onChange={(val) => onChange({ priceCents: val ? Number(val.replace(/\D/g, "")) * 100 : null })}
+          onChange={(val) => onChange(regeneratePresentation({ priceCents: val ? Number(val.replace(/\D/g, "")) * 100 : null }))}
         />
-        <Field label="Cor" value={vehicle.color ?? ""} onChange={(val) => onChange({ color: val })} />
+        <Field label="Cor" value={vehicle.color ?? ""} onChange={(val) => onChange(regeneratePresentation({ color: val }))} />
         <SelectField
           label="Combustível"
           value={vehicle.fuel ?? ""}
@@ -978,12 +1015,21 @@ function VehicleRow({
         </div>
         <div className="sm:col-span-2">
           <label className="block text-xs">
-            <span className="mb-1 block text-muted-foreground">Descrição</span>
+            <span className="mb-1 flex items-center justify-between text-muted-foreground">
+              <span>Resumo da apresentação</span>
+              <button
+                type="button"
+                onClick={() => onChange(regeneratePresentation({ description: "" }))}
+                className="text-[10px] text-primary hover:underline"
+              >
+                Gerar resumo
+              </button>
+            </span>
             <textarea
               value={vehicle.description ?? ""}
               onChange={(e) => onChange({ description: e.target.value })}
               rows={3}
-              placeholder="Ex: Único dono, IPVA pago, revisões em dia, pneus novos..."
+              placeholder="O resumo é gerado automaticamente, mas você pode editar ou completar..."
               className="w-full rounded-md border border-border bg-background px-2.5 py-2 text-sm outline-none focus:ring-1 focus:ring-ring resize-y min-h-[80px]"
             />
           </label>
