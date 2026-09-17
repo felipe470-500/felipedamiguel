@@ -212,7 +212,7 @@ function Editor({
     listVehicles()
       .then((rows) =>
         setItems(
-          rows.map((r) => ({
+           rows.map((r) => ({
             id: r.id,
             name: r.name,
             year: r.year,
@@ -222,6 +222,21 @@ function Editor({
             images: r.images ?? [],
             plate: r.plate ?? undefined,
             description: r.description ?? undefined,
+            brand: r.brand ?? undefined,
+            model: r.model ?? undefined,
+            version: r.version ?? undefined,
+            manufactureYear: r.manufactureYear ?? undefined,
+            modelYear: r.modelYear ?? undefined,
+            mileageKm: r.mileageKm ?? undefined,
+            priceCents: r.priceCents ?? undefined,
+            color: r.color ?? undefined,
+            fuel: r.fuel ?? undefined,
+            transmission: r.transmission ?? undefined,
+            bodyType: r.bodyType ?? undefined,
+            doors: r.doors ?? undefined,
+            vin: r.vin ?? undefined,
+            optionalFeatures: r.optionalFeatures ?? [],
+            status: r.status ?? undefined,
           })),
         ),
       )
