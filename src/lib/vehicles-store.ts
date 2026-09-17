@@ -241,7 +241,8 @@ export function generateVehicleSummary(vehicle: Partial<Vehicle>): string {
       ? `R$ ${(vehicle.priceCents / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`
       : vehicle.price || "R$ 0,00";
   const year = vehicle.modelYear ? String(vehicle.modelYear) : vehicle.year || "";
-  return `Veículo ${year}${engine ? `, motor ${engine}` : ""}, na cor ${vehicle.color || ""}, com ${km} km rodados. Preço de venda: ${price}.`;
+  const optionals = formatOptionalFeatures(vehicle.optionalFeatures);
+  return `Veículo ${year}${engine ? `, motor ${engine}` : ""}, na cor ${vehicle.color || ""}, com ${km} km rodados. Preço de venda: ${price}.${optionals ? ` ${optionals}` : ""}`;
 }
 
 /** Campos obrigatórios do estoque central (valem no site e nas integrações). */
