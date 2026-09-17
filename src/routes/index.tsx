@@ -13,6 +13,14 @@ import { MediaImg, MediaVideo } from "@/components/vehicle-viewer/MediaFallback"
 import { buildVehicleShareUrl } from "@/lib/canonical-url";
 import { trackWhatsAppClick, trackEvent, type TrackingParams } from "@/lib/analytics";
 
+/** Marcas conhecidas usadas só como fallback para anúncios antigos sem marca estruturada. */
+const KNOWN_BRANDS = [
+  "Fiat", "Volkswagen", "Chevrolet", "Ford", "Toyota", "Honda", "Hyundai",
+  "Renault", "Nissan", "Jeep", "Mitsubishi", "Peugeot", "Citroën", "Citroen",
+  "Kia", "BMW", "Mercedes-Benz", "Mercedes", "Audi", "Volvo", "Land Rover",
+  "Caoa Chery", "Chery", "BYD", "GWM", "RAM", "Suzuki", "Subaru", "JAC",
+  "Changan", "Lifan", "SsangYong", "Troller", "Effa", "Iveco", "Agrale",
+];
 
 const FALLBACK_IMAGE =
   "data:image/svg+xml;utf8," +
