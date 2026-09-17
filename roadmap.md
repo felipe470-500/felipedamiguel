@@ -17,3 +17,4 @@
 - [ ] Preservar e validar catálogo, fotos, leads, feed e links durante a migração.
 - [ ] Processar as notificações recebidas do Mercado Livre (hoje apenas registradas).
 - [x] Tornar os campos obrigatórios do veículo obrigatórios também no cadastro do site (painel admin), com bloqueio e lista de pendências.
+- [ ] Cadastrar token APIPLACAS_TOKEN (usuário) e testar botão Buscar dados pela placa
