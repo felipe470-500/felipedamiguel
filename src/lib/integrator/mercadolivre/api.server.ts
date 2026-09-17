@@ -129,11 +129,7 @@ export async function refreshAccessToken(refreshToken: string): Promise<MlTokenS
   });
 }
 
-type SupabaseAdmin = Awaited<
-  ReturnType<typeof import("@/integrations/supabase/client.server").supabaseAdmin.from>
-> extends never
-  ? never
-  : typeof import("@/integrations/supabase/client.server").supabaseAdmin;
+export type SupabaseAdmin = typeof import("@/integrations/supabase/client.server")["supabaseAdmin"];
 
 export async function saveTokens(
   supabaseAdmin: SupabaseAdmin,
