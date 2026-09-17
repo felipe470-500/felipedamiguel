@@ -931,7 +931,7 @@ function VehicleRow({
               className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-secondary px-3 py-2 text-xs font-semibold text-foreground hover:bg-secondary/80 disabled:opacity-60"
             >
               <Search className="h-3.5 w-3.5" />
-              {plateLoading ? "Buscando…" : "Buscar dados pela placa"}
+              {plateLoading ? "Consultando…" : "Consultar placa"}
             </button>
           </div>
           {plateMsg && (
