@@ -12,5 +12,6 @@
 - [ ] Etapa 2: migrar o estoque atual para o modelo canônico de veículo.
 - [ ] Etapa 3: serviços de domínio e API privada v1.
 - [ ] Etapa 6/7: fila de sincronização, retentativas e painel de logs.
-- [ ] Etapa 8: conector Mercado Livre (OAuth e operações confirmadas).
+- [x] Etapa 8: conector Mercado Livre (OAuth, publicar, atualizar, pausar, reativar, remover, qualidade e quota).
+- [ ] Cadastrar App ID e Secret Key do Mercado Livre e conectar a conta da loja.
 - [ ] Preservar e validar catálogo, fotos, leads, feed e links durante a migração.
