@@ -346,7 +346,7 @@ function Editor({
           password: getAdminPassword(),
           vehicles: items.map((v) => ({
             id: v.id && !v.id.startsWith("tmp-") ? v.id : null,
-            name: v.name,
+            name: generateVehicleHeadline(v) || v.name,
             year: v.year,
             km: v.km,
             price: v.price,
@@ -918,9 +918,18 @@ function VehicleRow({
 
       <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
         <div className="sm:col-span-2">
-          <span className="mb-1 block text-xs text-muted-foreground">Headline (gerada automaticamente após a consulta da placa)</span>
+          <span className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
+            <span>Headline (gerada automaticamente)</span>
+            <button
+              type="button"
+              onClick={() => onChange(regeneratePresentation({}))}
+              className="text-[10px] text-primary hover:underline"
+            >
+              Gerar headline
+            </button>
+          </span>
           <div className="w-full rounded-md border border-border bg-muted px-2.5 py-2 text-sm text-foreground">
-            {vehicle.name || (
+            {generateVehicleHeadline(vehicle) || (
               <span className="text-muted-foreground">Informe a placa e consulte para gerar a headline</span>
             )}
           </div>

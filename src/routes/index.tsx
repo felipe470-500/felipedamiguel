@@ -13,6 +13,14 @@ import { MediaImg, MediaVideo } from "@/components/vehicle-viewer/MediaFallback"
 import { buildVehicleShareUrl } from "@/lib/canonical-url";
 import { trackWhatsAppClick, trackEvent, type TrackingParams } from "@/lib/analytics";
 
+/** Marcas conhecidas usadas só como fallback para anúncios antigos sem marca estruturada. */
+const KNOWN_BRANDS = [
+  "Fiat", "Volkswagen", "Chevrolet", "Ford", "Toyota", "Honda", "Hyundai",
+  "Renault", "Nissan", "Jeep", "Mitsubishi", "Peugeot", "Citroën", "Citroen",
+  "Kia", "BMW", "Mercedes-Benz", "Mercedes", "Audi", "Volvo", "Land Rover",
+  "Caoa Chery", "Chery", "BYD", "GWM", "RAM", "Suzuki", "Subaru", "JAC",
+  "Changan", "Lifan", "SsangYong", "Troller", "Effa", "Iveco", "Agrale",
+];
 
 const FALLBACK_IMAGE =
   "data:image/svg+xml;utf8," +
@@ -153,6 +161,9 @@ function Landing() {
           tag: r.tag ?? undefined,
           images: r.images ?? [],
           description: r.description ?? undefined,
+          brand: r.brand ?? undefined,
+          model: r.model ?? undefined,
+          version: r.version ?? undefined,
         }));
         setVehicles(mapped);
         setLoading(false);
@@ -298,14 +309,20 @@ function Landing() {
   };
 
   // Memoiza derivados do catálogo — só recalcula quando vehicles mudar.
+  const brandOf = (v: Vehicle) => {
+    const structured = (v.brand || "").trim();
+    if (structured) return structured;
+    // Fallback para veículos antigos sem marca estruturada: procura uma marca
+    // conhecida dentro do nome do anúncio (nunca usa o modelo como marca).
+    const haystack = (v.name || "").toLowerCase();
+    const found = KNOWN_BRANDS.find((b) => haystack.includes(b.toLowerCase()));
+    return found || "";
+  };
+
   const brands = useMemo(
     () =>
       Array.from(
-        new Set(
-          vehicles
-            .map((v) => (v.brand || "").trim())
-            .filter((b) => b && b.length > 1),
-        ),
+        new Set(vehicles.map((v) => brandOf(v)).filter((b) => b && b.length > 1)),
       ).sort(),
     [vehicles],
   );
@@ -345,7 +362,7 @@ function Landing() {
           .join(" ")
           .toLowerCase()
           .includes(q);
-      const brand = (v.brand || "").trim();
+      const brand = brandOf(v);
       const matchesBrand = !selectedBrand || brand.toLowerCase() === selectedBrand.toLowerCase();
       const yearMatch = (v.year || "").match(/\d{4}/);
       const matchesYear = !selectedYear || (yearMatch && yearMatch[0] === selectedYear);
