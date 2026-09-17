@@ -31,6 +31,8 @@ const VehicleInput = z.object({
   vin: nullableText,
   optionalFeatures: z.array(z.string()).optional(),
   status: z.enum(["DRAFT","AVAILABLE","RESERVED","SOLD","ARCHIVED"]).nullable().optional(),
+  /** true apenas para o veículo criado/editado agora (os demais são só reenvio da lista). */
+  validate: z.boolean().optional(),
 });
 
 const STRUCTURED_COLUMNS =
@@ -129,7 +131,8 @@ export const saveVehiclesFn = createServerFn({ method: "POST" })
     // obrigatórios só são exigidos fora do status DRAFT. Cadastros novos e já migrados
     // são validados; o estoque antigo ainda não preenchido continua salvável até ser
     // completado (aparece como pendente nos painéis).
-    const invalidPlate = data.vehicles
+    const edited = data.vehicles.filter((v) => v.validate === true || !v.id);
+    const invalidPlate = edited
       .filter((v) => !isValidPlate(v.plate))
       .map((v) => v.name || "Sem nome");
     if (invalidPlate.length > 0) {
@@ -138,11 +141,7 @@ export const saveVehiclesFn = createServerFn({ method: "POST" })
       );
     }
 
-    const blocked = data.vehicles
-      .filter((v) => {
-        const migrated = Boolean(v.brand || v.model || v.version || v.priceCents || v.mileageKm);
-        return !v.id || migrated;
-      })
+    const blocked = edited
       .map((v) => ({ name: v.name, missing: missingRequiredFields({ ...v, id: v.id ?? undefined }) }))
       .filter((item) => item.missing.length > 0);
     if (blocked.length > 0) {

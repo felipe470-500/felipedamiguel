@@ -187,6 +187,9 @@ function Editor({
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
+  // Só validamos os veículos realmente criados/editados agora; o estoque
+  // antigo ainda incompleto não pode bloquear um cadastro novo.
+  const [dirtyIds, setDirtyIds] = useState<Set<string>>(new Set());
  
   const listVehicles = useServerFn(listVehiclesFn);
   const saveVehicles = useServerFn(saveVehiclesFn);
@@ -291,6 +294,7 @@ function Editor({
   }
 
   function update(id: string, patch: Partial<Vehicle>) {
+    setDirtyIds((prev) => (prev.has(id) ? prev : new Set(prev).add(id)));
     setItems((prev) => prev.map((v) => (v.id === id ? { ...v, ...patch } : v)));
   }
   function remove(id: string) {
@@ -312,7 +316,10 @@ function Editor({
     setItems((prev) => [novo, ...prev]);
   }
   async function persist() {
-    const invalidPlate = items
+    const isEdited = (v: Vehicle) => v.id.startsWith("tmp-") || dirtyIds.has(v.id);
+    const edited = items.filter(isEdited);
+
+    const invalidPlate = edited
       .filter((v) => !isValidPlate(v.plate))
       .map((v) => v.name || "Sem nome");
     if (invalidPlate.length > 0) {
@@ -322,12 +329,7 @@ function Editor({
       return;
     }
 
-    const incomplete = items
-      .filter(
-        (v) =>
-          v.id.startsWith("tmp-") ||
-          Boolean(v.brand || v.model || v.version || v.priceCents || v.mileageKm),
-      )
+    const incomplete = edited
       .map((v) => ({ name: v.name, missing: missingRequiredFields(v) }))
       .filter((item) => item.missing.length > 0);
     if (incomplete.length > 0) {
@@ -369,9 +371,11 @@ function Editor({
             vin: v.vin ?? null,
             optionalFeatures: v.optionalFeatures ?? [],
             status: v.status ?? "AVAILABLE",
+            validate: isEdited(v),
           })),
         },
       });
+      setDirtyIds(new Set());
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } catch (e) {
