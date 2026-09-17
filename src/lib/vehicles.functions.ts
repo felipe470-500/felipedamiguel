@@ -131,7 +131,8 @@ export const saveVehiclesFn = createServerFn({ method: "POST" })
     // obrigatórios só são exigidos fora do status DRAFT. Cadastros novos e já migrados
     // são validados; o estoque antigo ainda não preenchido continua salvável até ser
     // completado (aparece como pendente nos painéis).
-    const invalidPlate = data.vehicles
+    const edited = data.vehicles.filter((v) => v.validate === true || !v.id);
+    const invalidPlate = edited
       .filter((v) => !isValidPlate(v.plate))
       .map((v) => v.name || "Sem nome");
     if (invalidPlate.length > 0) {
