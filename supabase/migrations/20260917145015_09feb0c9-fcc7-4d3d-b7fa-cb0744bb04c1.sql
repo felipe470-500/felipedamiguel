@@ -1,0 +1,2 @@
+ALTER TABLE public.vehicles ALTER COLUMN store_id SET DEFAULT '39040646-0f4d-4385-b0f4-1eeea86258d6'::uuid;
+ALTER TABLE public.leads ALTER COLUMN store_id SET DEFAULT '39040646-0f4d-4385-b0f4-1eeea86258d6'::uuid;

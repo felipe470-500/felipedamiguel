@@ -139,7 +139,7 @@ export type Database = {
           platform_id?: string | null
           source?: string
           status?: string
-          store_id: string
+          store_id?: string
           updated_at?: string
           vehicle_id?: string | null
           whatsapp: string
@@ -906,7 +906,7 @@ export type Database = {
           record_version?: number
           seller_id?: string | null
           status?: Database["public"]["Enums"]["vehicle_status"]
-          store_id: string
+          store_id?: string
           tag?: string | null
           transmission?: string | null
           updated_at?: string
