@@ -31,6 +31,8 @@ const VehicleInput = z.object({
   vin: nullableText,
   optionalFeatures: z.array(z.string()).optional(),
   status: z.enum(["DRAFT","AVAILABLE","RESERVED","SOLD","ARCHIVED"]).nullable().optional(),
+  /** true apenas para o veículo criado/editado agora (os demais são só reenvio da lista). */
+  validate: z.boolean().optional(),
 });
 
 const STRUCTURED_COLUMNS =
