@@ -39,12 +39,14 @@ export const getMercadoLivreStatusFn = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { storeId } = await requireStoreAdmin(context as never);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { ensureMlIntegration, readContact, getSilverQuota } = await import(
+    const { ensureMlIntegration, resolveMlStoreData, getSilverQuota } = await import(
       "@/lib/integrator/mercadolivre/service.server"
     );
 
     const integration = await ensureMlIntegration(supabaseAdmin, storeId);
-    const contact = readContact(integration.capabilities ?? {});
+    const { store, contact } = await resolveMlStoreData(supabaseAdmin, storeId, integration.capabilities ?? {});
+    const storeReady = Boolean(contact);
+
 
     const { data: credential } = await supabaseAdmin
       .from("integration_credentials")
@@ -80,6 +82,8 @@ export const getMercadoLivreStatusFn = createServerFn({ method: "POST" })
       tokenExpiresAt: credential?.expires_at ?? null,
       lastError: integration.last_error,
       contact,
+      storeReady,
+      storeProfile: store,
       listings: listings ?? 0,
       quota,
     };
@@ -167,13 +171,15 @@ export const listMercadoLivreVehiclesFn = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { storeId } = await requireStoreAdmin(context as never);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { ensureMlIntegration } = await import("@/lib/integrator/mercadolivre/service.server");
+    const { ensureMlIntegration, resolveMlStoreData, toCanonicalVehicle, mlReadiness, VEHICLE_COLUMNS } =
+      await import("@/lib/integrator/mercadolivre/service.server");
     const integration = await ensureMlIntegration(supabaseAdmin, storeId);
+    const { store } = await resolveMlStoreData(supabaseAdmin, storeId, integration.capabilities ?? {});
 
     const [{ data: vehicles, error }, { data: links }] = await Promise.all([
       supabaseAdmin
         .from("vehicles")
-        .select("id, name, price, year, status, images, brand, model, plate")
+        .select(`${VEHICLE_COLUMNS}, year, km, position`)
         .eq("store_id", storeId)
         .order("position", { ascending: true })
         .limit(300),
@@ -185,13 +191,24 @@ export const listMercadoLivreVehiclesFn = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     const byVehicle = new Map((links ?? []).map((link) => [link.vehicle_id, link]));
-    return (vehicles ?? []).map((vehicle) => ({
-      id: vehicle.id,
-      name: vehicle.name,
-      price: vehicle.price,
-      year: vehicle.year,
-      status: vehicle.status,
-      photos: (vehicle.images ?? []).length,
-      listing: byVehicle.get(vehicle.id) ?? null,
-    }));
+    return (vehicles ?? []).map((row) => {
+      const vehicle = toCanonicalVehicle(row as never);
+      const report = mlReadiness(vehicle, store, integration.status === "CONNECTED");
+      const source = row as unknown as { id: string; name: string; price: string; year: string };
+      return {
+        id: source.id,
+        name: source.name,
+        price: source.price,
+        year: source.year,
+        status: vehicle.status,
+        photos: vehicle.photos.length,
+        listing: byVehicle.get(source.id) ?? null,
+        readiness: {
+          ready: report.ready,
+          configured: report.configured,
+          results: report.results,
+          missing: report.missing.map((item) => ({ label: item.label, scope: item.scope, hint: item.hint })),
+        },
+      };
+    });
   });

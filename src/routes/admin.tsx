@@ -11,6 +11,11 @@ import {
   fileToCompressedDataURL,
   type Vehicle,
   isVideoUrl,
+  missingRequiredFields,
+  FUEL_OPTIONS,
+  TRANSMISSION_OPTIONS,
+  BODY_OPTIONS,
+  STATUS_OPTIONS,
 } from "@/lib/vehicles-store";
 import { SELLERS } from "@/lib/sellers";
 import {
@@ -279,10 +284,28 @@ function Editor({
       price: "R$ 0",
       images: [],
       tag: "",
+      status: "DRAFT",
+      optionalFeatures: [],
     };
     setItems((prev) => [novo, ...prev]);
   }
   async function persist() {
+    const incomplete = items
+      .filter(
+        (v) =>
+          v.id.startsWith("tmp-") ||
+          Boolean(v.brand || v.model || v.version || v.priceCents || v.mileageKm),
+      )
+      .map((v) => ({ name: v.name, missing: missingRequiredFields(v) }))
+      .filter((item) => item.missing.length > 0);
+    if (incomplete.length > 0) {
+      setErrorMsg(
+        `Este veículo não está pronto para integração — ${incomplete
+          .map((item) => `${item.name || "Sem nome"}: faltam ${item.missing.join(", ")}`)
+          .join(" | ")}. Marque como Rascunho se quiser salvar incompleto.`,
+      );
+      return;
+    }
     setSaving(true);
     setErrorMsg("");
     try {
@@ -299,6 +322,21 @@ function Editor({
             images: v.images,
             plate: v.plate ?? null,
             description: v.description ?? null,
+            brand: v.brand ?? null,
+            model: v.model ?? null,
+            version: v.version ?? null,
+            manufactureYear: v.manufactureYear ?? null,
+            modelYear: v.modelYear ?? null,
+            mileageKm: v.mileageKm ?? null,
+            priceCents: v.priceCents ?? null,
+            color: v.color ?? null,
+            fuel: v.fuel ?? null,
+            transmission: v.transmission ?? null,
+            bodyType: v.bodyType ?? null,
+            doors: v.doors ?? null,
+            vin: v.vin ?? null,
+            optionalFeatures: v.optionalFeatures ?? [],
+            status: v.status ?? "AVAILABLE",
           })),
         },
       });
@@ -785,9 +823,82 @@ function VehicleRow({
         <Field label="KM" value={vehicle.km} onChange={(val) => onChange({ km: val })} />
         <Field label="Preço" value={vehicle.price} onChange={(val) => onChange({ price: val })} />
         <Field label="Placa (apenas no admin)" value={vehicle.plate ?? ""} onChange={(val) => onChange({ plate: val })} />
+        <Field label="Marca" value={vehicle.brand ?? ""} onChange={(val) => onChange({ brand: val })} />
+        <Field label="Modelo" value={vehicle.model ?? ""} onChange={(val) => onChange({ model: val })} />
+        <Field label="Versão" value={vehicle.version ?? ""} onChange={(val) => onChange({ version: val })} />
+        <Field
+          label="Ano de fabricação"
+          value={vehicle.manufactureYear ? String(vehicle.manufactureYear) : ""}
+          onChange={(val) => onChange({ manufactureYear: val ? Number(val.replace(/\D/g, "")) : null })}
+        />
+        <Field
+          label="Ano do modelo"
+          value={vehicle.modelYear ? String(vehicle.modelYear) : ""}
+          onChange={(val) => onChange({ modelYear: val ? Number(val.replace(/\D/g, "")) : null })}
+        />
+        <Field
+          label="Quilometragem (km)"
+          value={vehicle.mileageKm != null ? String(vehicle.mileageKm) : ""}
+          onChange={(val) => onChange({ mileageKm: val ? Number(val.replace(/\D/g, "")) : null })}
+        />
+        <Field
+          label="Preço (R$)"
+          value={vehicle.priceCents != null ? String(Math.round(vehicle.priceCents / 100)) : ""}
+          onChange={(val) => onChange({ priceCents: val ? Number(val.replace(/\D/g, "")) * 100 : null })}
+        />
+        <Field label="Cor" value={vehicle.color ?? ""} onChange={(val) => onChange({ color: val })} />
+        <SelectField
+          label="Combustível"
+          value={vehicle.fuel ?? ""}
+          options={FUEL_OPTIONS}
+          onChange={(val) => onChange({ fuel: val || null })}
+        />
+        <SelectField
+          label="Câmbio"
+          value={vehicle.transmission ?? ""}
+          options={TRANSMISSION_OPTIONS}
+          onChange={(val) => onChange({ transmission: val || null })}
+        />
+        <SelectField
+          label="Carroceria"
+          value={vehicle.bodyType ?? ""}
+          options={BODY_OPTIONS}
+          onChange={(val) => onChange({ bodyType: val || null })}
+        />
+        <Field
+          label="Portas"
+          value={vehicle.doors != null ? String(vehicle.doors) : ""}
+          onChange={(val) => onChange({ doors: val ? Number(val.replace(/\D/g, "")) : null })}
+        />
+        <Field label="Chassi / VIN (opcional)" value={vehicle.vin ?? ""} onChange={(val) => onChange({ vin: val })} />
+        <SelectField
+          label="Status do veículo"
+          value={vehicle.status ?? "AVAILABLE"}
+          options={STATUS_OPTIONS.map((option) => option.value)}
+          labels={Object.fromEntries(STATUS_OPTIONS.map((option) => [option.value, option.label]))}
+          onChange={(val) => onChange({ status: val || "AVAILABLE" })}
+        />
         <div className="sm:col-span-2">
           <label className="block text-xs">
-            <span className="mb-1 block text-muted-foreground">Descrição / Observações (opcional)</span>
+            <span className="mb-1 block text-muted-foreground">Opcionais (separados por vírgula)</span>
+            <input
+              value={(vehicle.optionalFeatures ?? []).join(", ")}
+              onChange={(e) =>
+                onChange({
+                  optionalFeatures: e.target.value
+                    .split(",")
+                    .map((item) => item.trim())
+                    .filter(Boolean),
+                })
+              }
+              placeholder="Ar-condicionado, Direção elétrica, Câmera de ré"
+              className="w-full rounded-md border border-border bg-background px-2.5 py-2 text-sm outline-none focus:ring-1 focus:ring-ring"
+            />
+          </label>
+        </div>
+        <div className="sm:col-span-2">
+          <label className="block text-xs">
+            <span className="mb-1 block text-muted-foreground">Descrição</span>
             <textarea
               value={vehicle.description ?? ""}
               onChange={(e) => onChange({ description: e.target.value })}
@@ -798,6 +909,27 @@ function VehicleRow({
           </label>
         </div>
       </div>
+
+      {(() => {
+        const missing = missingRequiredFields(vehicle);
+        if (missing.length === 0) {
+          return (
+            <p className="mt-3 rounded-md bg-primary/10 px-3 py-2 text-xs text-primary">
+              ✅ Pronto para integração
+            </p>
+          );
+        }
+        return (
+          <div className="mt-3 rounded-md bg-destructive/10 px-3 py-2 text-xs text-destructive">
+            <p className="font-medium">Este veículo não está pronto para integração.</p>
+            <ul className="mt-1 space-y-0.5">
+              {missing.map((item) => (
+                <li key={item}>❌ {item}</li>
+              ))}
+            </ul>
+          </div>
+        );
+      })()}
     </div>
   );
 }
@@ -819,6 +951,38 @@ function Field({
         onChange={(e) => onChange(e.target.value)}
         className="w-full rounded-md border border-border bg-background px-2.5 py-2 text-sm outline-none focus:ring-1 focus:ring-ring"
       />
+    </label>
+  );
+}
+
+function SelectField({
+  label,
+  value,
+  options,
+  labels,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  options: string[];
+  labels?: Record<string, string>;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <label className="block text-xs">
+      <span className="mb-1 block text-muted-foreground">{label}</span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full rounded-md border border-border bg-background px-2.5 py-2 text-sm outline-none focus:ring-1 focus:ring-ring"
+      >
+        <option value="">Selecione</option>
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {labels?.[option] ?? option}
+          </option>
+        ))}
+      </select>
     </label>
   );
 }

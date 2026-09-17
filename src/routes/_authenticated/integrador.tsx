@@ -104,7 +104,7 @@ function IntegratorDashboard() {
       <header className="border-b border-border bg-card">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
           <div className="flex items-center gap-3"><div className="grid size-10 place-items-center rounded-md bg-primary text-primary-foreground"><Boxes className="size-5" /></div><div><p className="text-xs font-medium uppercase text-muted-foreground">Miguel Veículos</p><h1 className="text-lg font-bold">Integrador automotivo</h1></div></div>
-          <div className="flex items-center gap-2"><Button asChild variant="outline" size="sm"><Link to="/integracoes/mercado-livre" search={{ conectado: undefined, erro: undefined }}>Mercado Livre</Link></Button><Button asChild variant="outline" size="sm"><Link to="/admin">Painel atual</Link></Button><Button variant="ghost" size="icon" aria-label="Sair" title="Sair" onClick={signOut}><LogOut className="size-4" /></Button></div>
+          <div className="flex items-center gap-2"><Button asChild variant="outline" size="sm"><Link to="/integracoes/mercado-livre" search={{ conectado: undefined, erro: undefined }}>Mercado Livre</Link></Button><Button asChild variant="outline" size="sm"><Link to="/configuracoes-loja">Configurações da loja</Link></Button><Button asChild variant="outline" size="sm"><Link to="/admin">Painel atual</Link></Button><Button variant="ghost" size="icon" aria-label="Sair" title="Sair" onClick={signOut}><LogOut className="size-4" /></Button></div>
         </div>
       </header>
 

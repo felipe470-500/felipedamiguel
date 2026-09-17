@@ -1,4 +1,6 @@
 import type { CanonicalVehicle } from "@/lib/integrator/connector";
+import { evaluatePlatformReadiness } from "@/lib/integrator/platform-rules";
+import type { ReadinessReport, StoreProfileData } from "@/lib/integrator/validation";
 
 import {
   categorizeMlError,
@@ -11,7 +13,7 @@ import {
   buildDescriptionText,
   buildItemPayload,
   buildUpdatePayload,
-  validateForMercadoLivre,
+  contactFromStoreProfile,
   type MlStoreContact,
 } from "./mapping";
 
@@ -44,7 +46,10 @@ type VehicleRow = {
   color: string | null;
   fuel: string | null;
   transmission: string | null;
+  body_type: string | null;
   doors: number | null;
+  optional_features: string[] | null;
+  videos: string[] | null;
   description: string | null;
   plate: string | null;
   vin: string | null;
@@ -54,8 +59,8 @@ type VehicleRow = {
   record_version: number;
 };
 
-const VEHICLE_COLUMNS =
-  "id, store_id, name, brand, model, version, manufacture_year, model_year, price_cents, price, mileage_km, color, fuel, transmission, doors, description, plate, vin, status, images, internal_code, record_version";
+export const VEHICLE_COLUMNS =
+  "id, store_id, name, brand, model, version, manufacture_year, model_year, price_cents, price, mileage_km, color, fuel, transmission, body_type, doors, optional_features, videos, description, plate, vin, status, images, internal_code, record_version";
 
 function parsePriceCents(row: VehicleRow): number | null {
   if (typeof row.price_cents === "number" && row.price_cents > 0) return row.price_cents;
@@ -82,14 +87,52 @@ export function toCanonicalVehicle(row: VehicleRow): CanonicalVehicle {
     color: row.color,
     fuel: row.fuel,
     transmission: row.transmission,
+    bodyType: row.body_type,
     doors: row.doors,
+    optionalFeatures: row.optional_features ?? [],
     description: row.description,
     plate: row.plate,
     vin: row.vin,
     status: row.status,
     photos,
-    videos: [],
+    videos: row.videos ?? [],
     recordVersion: row.record_version,
+  };
+}
+
+export type { VehicleRow };
+
+/** Lê a ficha da loja usada por todos os conectores. */
+export async function readStoreProfile(
+  supabaseAdmin: SupabaseAdmin,
+  storeId: string,
+): Promise<StoreProfileData | null> {
+  const { data } = await supabaseAdmin
+    .from("store_profiles")
+    .select("*")
+    .eq("store_id", storeId)
+    .maybeSingle();
+  if (!data) return null;
+  const row = data as Record<string, unknown>;
+  const text = (key: string) => (row[key] == null ? null : String(row[key]));
+  const num = (key: string) => (row[key] == null ? null : Number(row[key]));
+  return {
+    tradeName: text("trade_name"),
+    legalName: text("legal_name"),
+    taxId: text("tax_id"),
+    phone: text("phone"),
+    whatsapp: text("whatsapp"),
+    email: text("email"),
+    postalCode: text("postal_code"),
+    street: text("street"),
+    streetNumber: text("street_number"),
+    complement: text("complement"),
+    neighborhood: text("neighborhood"),
+    city: text("city"),
+    stateCode: text("state_code"),
+    countryCode: text("country_code"),
+    latitude: num("latitude"),
+    longitude: num("longitude"),
   };
 }
 
@@ -215,6 +258,55 @@ export type MlSyncOutcome = {
   errorMessage?: string;
 };
 
+/** Ficha de loja derivada do contato antigo salvo em capabilities (compatibilidade). */
+function storeFromLegacyContact(contact: MlStoreContact | null): StoreProfileData | null {
+  if (!contact) return null;
+  return {
+    tradeName: null,
+    legalName: null,
+    taxId: null,
+    phone: contact.whatsapp,
+    whatsapp: contact.whatsapp,
+    email: null,
+    postalCode: null,
+    street: null,
+    streetNumber: null,
+    complement: null,
+    neighborhood: null,
+    city: contact.city,
+    stateCode: contact.stateId.replace("BR-", ""),
+    countryCode: "BR",
+    latitude: null,
+    longitude: null,
+  };
+}
+
+/** Resolve a ficha da loja (nova) com fallback para o contato antigo. */
+export async function resolveMlStoreData(
+  supabaseAdmin: SupabaseAdmin,
+  storeId: string,
+  capabilities: Record<string, unknown>,
+): Promise<{ store: StoreProfileData | null; contact: MlStoreContact | null }> {
+  const profile = await readStoreProfile(supabaseAdmin, storeId);
+  const fromProfile = contactFromStoreProfile(profile);
+  if (fromProfile) return { store: profile, contact: fromProfile };
+  const legacy = readContact(capabilities ?? {});
+  return { store: profile ?? storeFromLegacyContact(legacy), contact: legacy };
+}
+
+/** Checklist do Mercado Livre para um veículo. */
+export function mlReadiness(
+  vehicle: CanonicalVehicle,
+  store: StoreProfileData | null,
+  connected: boolean,
+): ReadinessReport {
+  return evaluatePlatformReadiness(ML_PLATFORM_ID, {
+    vehicle,
+    store,
+    integrationConnected: connected,
+  });
+}
+
 /** Cria ou atualiza o anúncio do veículo no Mercado Livre, conforme já exista item_id. */
 export async function syncVehicleToMl(
   supabaseAdmin: SupabaseAdmin,
@@ -222,7 +314,7 @@ export async function syncVehicleToMl(
   vehicleId: string,
 ): Promise<MlSyncOutcome> {
   const integration = await ensureMlIntegration(supabaseAdmin, storeId);
-  const contact = readContact(integration.capabilities ?? {});
+  const { store, contact } = await resolveMlStoreData(supabaseAdmin, storeId, integration.capabilities ?? {});
 
   const { data: vehicleRow, error: vehicleError } = await supabaseAdmin
     .from("vehicles")
@@ -234,8 +326,11 @@ export async function syncVehicleToMl(
   if (!vehicleRow) throw new Error("Veículo não encontrado");
 
   const vehicle = toCanonicalVehicle(vehicleRow as unknown as VehicleRow);
-  const issues = validateForMercadoLivre(vehicle, contact);
-  if (issues.length > 0 || !contact) {
+  const report = mlReadiness(vehicle, store, integration.status === "CONNECTED");
+  const issues = report.missing.map((item) => item.label);
+  // Nada é enviado à API antes do checklist passar.
+  if (!report.ready || !contact) {
+    if (issues.length === 0) issues.push("Dados de contato e localização da loja não configurados");
     await saveVehicleIntegration(supabaseAdmin, {
       vehicleId,
       storeIntegrationId: integration.id,
@@ -254,6 +349,7 @@ export async function syncVehicleToMl(
     });
     return { ok: false, issues };
   }
+
 
   const tokens = await getValidAccessToken(supabaseAdmin, integration.id);
   const { data: link } = await supabaseAdmin
