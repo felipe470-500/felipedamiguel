@@ -141,11 +141,7 @@ export const saveVehiclesFn = createServerFn({ method: "POST" })
       );
     }
 
-    const blocked = data.vehicles
-      .filter((v) => {
-        const migrated = Boolean(v.brand || v.model || v.version || v.priceCents || v.mileageKm);
-        return !v.id || migrated;
-      })
+    const blocked = edited
       .map((v) => ({ name: v.name, missing: missingRequiredFields({ ...v, id: v.id ?? undefined }) }))
       .filter((item) => item.missing.length > 0);
     if (blocked.length > 0) {
