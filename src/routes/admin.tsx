@@ -1015,12 +1015,21 @@ function VehicleRow({
         </div>
         <div className="sm:col-span-2">
           <label className="block text-xs">
-            <span className="mb-1 block text-muted-foreground">Descrição</span>
+            <span className="mb-1 flex items-center justify-between text-muted-foreground">
+              <span>Resumo da apresentação</span>
+              <button
+                type="button"
+                onClick={() => onChange(regeneratePresentation({ description: "" }))}
+                className="text-[10px] text-primary hover:underline"
+              >
+                Gerar resumo
+              </button>
+            </span>
             <textarea
               value={vehicle.description ?? ""}
               onChange={(e) => onChange({ description: e.target.value })}
               rows={3}
-              placeholder="Ex: Único dono, IPVA pago, revisões em dia, pneus novos..."
+              placeholder="O resumo é gerado automaticamente, mas você pode editar ou completar..."
               className="w-full rounded-md border border-border bg-background px-2.5 py-2 text-sm outline-none focus:ring-1 focus:ring-ring resize-y min-h-[80px]"
             />
           </label>
