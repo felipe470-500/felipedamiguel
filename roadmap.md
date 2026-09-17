@@ -16,4 +16,4 @@
 - [ ] Cadastrar App ID e Secret Key do Mercado Livre e conectar a conta da loja.
 - [ ] Preservar e validar catálogo, fotos, leads, feed e links durante a migração.
 - [ ] Processar as notificações recebidas do Mercado Livre (hoje apenas registradas).
-- [ ] Tornar os campos obrigatórios do veículo obrigatórios também no cadastro do site (painel admin), com bloqueio e lista de pendências.
+- [x] Tornar os campos obrigatórios do veículo obrigatórios também no cadastro do site (painel admin), com bloqueio e lista de pendências.
