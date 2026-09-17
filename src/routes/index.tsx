@@ -153,6 +153,9 @@ function Landing() {
           tag: r.tag ?? undefined,
           images: r.images ?? [],
           description: r.description ?? undefined,
+          brand: r.brand ?? undefined,
+          model: r.model ?? undefined,
+          version: r.version ?? undefined,
         }));
         setVehicles(mapped);
         setLoading(false);
