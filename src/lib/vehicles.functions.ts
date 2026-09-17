@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { missingRequiredFields } from "@/lib/vehicles-store";
+import { isValidPlate, missingRequiredFields } from "@/lib/vehicles-store";
 
 
 const nullableText = z.string().nullable().optional();
