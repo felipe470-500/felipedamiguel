@@ -316,7 +316,10 @@ function Editor({
     setItems((prev) => [novo, ...prev]);
   }
   async function persist() {
-    const invalidPlate = items
+    const isEdited = (v: Vehicle) => v.id.startsWith("tmp-") || dirtyIds.has(v.id);
+    const edited = items.filter(isEdited);
+
+    const invalidPlate = edited
       .filter((v) => !isValidPlate(v.plate))
       .map((v) => v.name || "Sem nome");
     if (invalidPlate.length > 0) {
@@ -326,12 +329,7 @@ function Editor({
       return;
     }
 
-    const incomplete = items
-      .filter(
-        (v) =>
-          v.id.startsWith("tmp-") ||
-          Boolean(v.brand || v.model || v.version || v.priceCents || v.mileageKm),
-      )
+    const incomplete = edited
       .map((v) => ({ name: v.name, missing: missingRequiredFields(v) }))
       .filter((item) => item.missing.length > 0);
     if (incomplete.length > 0) {
