@@ -301,14 +301,20 @@ function Landing() {
   };
 
   // Memoiza derivados do catálogo — só recalcula quando vehicles mudar.
+  const brandOf = (v: Vehicle) => {
+    const structured = (v.brand || "").trim();
+    if (structured) return structured;
+    // Fallback para veículos antigos sem marca estruturada: procura uma marca
+    // conhecida dentro do nome do anúncio (nunca usa o modelo como marca).
+    const haystack = (v.name || "").toLowerCase();
+    const found = KNOWN_BRANDS.find((b) => haystack.includes(b.toLowerCase()));
+    return found || "";
+  };
+
   const brands = useMemo(
     () =>
       Array.from(
-        new Set(
-          vehicles
-            .map((v) => (v.brand || "").trim())
-            .filter((b) => b && b.length > 1),
-        ),
+        new Set(vehicles.map((v) => brandOf(v)).filter((b) => b && b.length > 1)),
       ).sort(),
     [vehicles],
   );
