@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as FeedEstoqueDotjsonRouteImport } from './routes/feed/estoque[.]json'
 import { Route as AuthenticatedIntegradorRouteImport } from './routes/_authenticated/integrador'
 import { Route as ApiPublicVehicleImageRouteImport } from './routes/api/public/vehicle-image'
+import { Route as AuthenticatedIntegracoesMercadoLivreRouteImport } from './routes/_authenticated/integracoes/mercado-livre'
 import { Route as ApiPublicIntegrationsMercadolivreCallbackRouteImport } from './routes/api/public/integrations/mercadolivre/callback'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -58,6 +59,12 @@ const ApiPublicVehicleImageRoute = ApiPublicVehicleImageRouteImport.update({
   path: '/api/public/vehicle-image',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedIntegracoesMercadoLivreRoute =
+  AuthenticatedIntegracoesMercadoLivreRouteImport.update({
+    id: '/integracoes/mercado-livre',
+    path: '/integracoes/mercado-livre',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicIntegrationsMercadolivreCallbackRoute =
   ApiPublicIntegrationsMercadolivreCallbackRouteImport.update({
     id: '/api/public/integrations/mercadolivre/callback',
@@ -72,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/integrador': typeof AuthenticatedIntegradorRoute
   '/feed/estoque.json': typeof FeedEstoqueDotjsonRoute
+  '/integracoes/mercado-livre': typeof AuthenticatedIntegracoesMercadoLivreRoute
   '/api/public/vehicle-image': typeof ApiPublicVehicleImageRoute
   '/api/public/integrations/mercadolivre/callback': typeof ApiPublicIntegrationsMercadolivreCallbackRoute
 }
@@ -82,6 +90,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/integrador': typeof AuthenticatedIntegradorRoute
   '/feed/estoque.json': typeof FeedEstoqueDotjsonRoute
+  '/integracoes/mercado-livre': typeof AuthenticatedIntegracoesMercadoLivreRoute
   '/api/public/vehicle-image': typeof ApiPublicVehicleImageRoute
   '/api/public/integrations/mercadolivre/callback': typeof ApiPublicIntegrationsMercadolivreCallbackRoute
 }
@@ -94,6 +103,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/integrador': typeof AuthenticatedIntegradorRoute
   '/feed/estoque.json': typeof FeedEstoqueDotjsonRoute
+  '/_authenticated/integracoes/mercado-livre': typeof AuthenticatedIntegracoesMercadoLivreRoute
   '/api/public/vehicle-image': typeof ApiPublicVehicleImageRoute
   '/api/public/integrations/mercadolivre/callback': typeof ApiPublicIntegrationsMercadolivreCallbackRoute
 }
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/integrador'
     | '/feed/estoque.json'
+    | '/integracoes/mercado-livre'
     | '/api/public/vehicle-image'
     | '/api/public/integrations/mercadolivre/callback'
   fileRoutesByTo: FileRoutesByTo
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/integrador'
     | '/feed/estoque.json'
+    | '/integracoes/mercado-livre'
     | '/api/public/vehicle-image'
     | '/api/public/integrations/mercadolivre/callback'
   id:
@@ -127,6 +139,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/_authenticated/integrador'
     | '/feed/estoque.json'
+    | '/_authenticated/integracoes/mercado-livre'
     | '/api/public/vehicle-image'
     | '/api/public/integrations/mercadolivre/callback'
   fileRoutesById: FileRoutesById
@@ -200,6 +213,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicVehicleImageRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/integracoes/mercado-livre': {
+      id: '/_authenticated/integracoes/mercado-livre'
+      path: '/integracoes/mercado-livre'
+      fullPath: '/integracoes/mercado-livre'
+      preLoaderRoute: typeof AuthenticatedIntegracoesMercadoLivreRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/integrations/mercadolivre/callback': {
       id: '/api/public/integrations/mercadolivre/callback'
       path: '/api/public/integrations/mercadolivre/callback'
@@ -212,10 +232,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedIntegradorRoute: typeof AuthenticatedIntegradorRoute
+  AuthenticatedIntegracoesMercadoLivreRoute: typeof AuthenticatedIntegracoesMercadoLivreRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedIntegradorRoute: AuthenticatedIntegradorRoute,
+  AuthenticatedIntegracoesMercadoLivreRoute:
+    AuthenticatedIntegracoesMercadoLivreRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
