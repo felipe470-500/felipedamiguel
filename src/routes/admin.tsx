@@ -309,6 +309,16 @@ function Editor({
     setItems((prev) => [novo, ...prev]);
   }
   async function persist() {
+    const invalidPlate = items
+      .filter((v) => !isValidPlate(v.plate))
+      .map((v) => v.name || "Sem nome");
+    if (invalidPlate.length > 0) {
+      setErrorMsg(
+        `Placa inválida ou ausente em: ${invalidPlate.join(", ")}. Informe a placa e consulte os dados antes de salvar.`,
+      );
+      return;
+    }
+
     const incomplete = items
       .filter(
         (v) =>
