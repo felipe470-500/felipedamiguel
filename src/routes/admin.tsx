@@ -996,22 +996,35 @@ function VehicleRow({
           onChange={(val) => onChange({ status: val || "AVAILABLE" })}
         />
         <div className="sm:col-span-2">
-          <label className="block text-xs">
-            <span className="mb-1 block text-muted-foreground">Opcionais (separados por vírgula)</span>
-            <input
-              value={(vehicle.optionalFeatures ?? []).join(", ")}
-              onChange={(e) =>
-                onChange({
-                  optionalFeatures: e.target.value
-                    .split(",")
-                    .map((item) => item.trim())
-                    .filter(Boolean),
-                })
-              }
-              placeholder="Ar-condicionado, Direção elétrica, Câmera de ré"
-              className="w-full rounded-md border border-border bg-background px-2.5 py-2 text-sm outline-none focus:ring-1 focus:ring-ring"
-            />
-          </label>
+          <span className="mb-2 block text-xs text-muted-foreground">Principais opcionais</span>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {(Object.keys(OPTIONAL_FEATURES_BY_CATEGORY) as OptionalFeatureCategory[]).map((category) => (
+              <div key={category} className="rounded-md border border-border p-3">
+                <span className="mb-2 block text-xs font-medium text-foreground">{category}</span>
+                <div className="space-y-1.5">
+                  {OPTIONAL_FEATURES_BY_CATEGORY[category].map((feature) => {
+                    const selected = (vehicle.optionalFeatures ?? []).includes(feature);
+                    return (
+                      <label key={feature} className="flex cursor-pointer items-center gap-2 text-xs">
+                        <input
+                          type="checkbox"
+                          checked={selected}
+                          onChange={() => {
+                            const next = new Set(vehicle.optionalFeatures ?? []);
+                            if (next.has(feature)) next.delete(feature);
+                            else next.add(feature);
+                            onChange(regeneratePresentation({ optionalFeatures: Array.from(next) }));
+                          }}
+                          className="h-3.5 w-3.5 rounded border-border bg-background text-primary focus:ring-ring"
+                        />
+                        <span className={selected ? "text-foreground" : "text-muted-foreground"}>{feature}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
         <div className="sm:col-span-2">
           <label className="block text-xs">
