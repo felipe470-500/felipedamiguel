@@ -303,7 +303,7 @@ function Landing() {
       Array.from(
         new Set(
           vehicles
-            .map((v) => (v.name || "").trim().split(" ")[0])
+            .map((v) => (v.brand || "").trim())
             .filter((b) => b && b.length > 1),
         ),
       ).sort(),
@@ -341,11 +341,11 @@ function Landing() {
     return vehicles.filter((v) => {
       const matchesSearch =
         !q ||
-        [v.name || "", v.tag || "", v.year || "", v.km || "", v.price || ""]
+        [v.name || "", v.model || "", v.tag || "", v.year || "", v.km || "", v.price || ""]
           .join(" ")
           .toLowerCase()
           .includes(q);
-      const brand = (v.name || "").trim().split(" ")[0];
+      const brand = (v.brand || "").trim();
       const matchesBrand = !selectedBrand || brand.toLowerCase() === selectedBrand.toLowerCase();
       const yearMatch = (v.year || "").match(/\d{4}/);
       const matchesYear = !selectedYear || (yearMatch && yearMatch[0] === selectedYear);
@@ -507,7 +507,7 @@ function Landing() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Modelo, ano, tag..."
+                placeholder="Buscar por modelo, ano, tag..."
                 className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring text-foreground"
               />
             </div>
