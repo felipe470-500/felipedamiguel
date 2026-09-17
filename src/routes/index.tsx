@@ -341,11 +341,11 @@ function Landing() {
     return vehicles.filter((v) => {
       const matchesSearch =
         !q ||
-        [v.name || "", v.tag || "", v.year || "", v.km || "", v.price || ""]
+        [v.name || "", v.model || "", v.tag || "", v.year || "", v.km || "", v.price || ""]
           .join(" ")
           .toLowerCase()
           .includes(q);
-      const brand = (v.name || "").trim().split(" ")[0];
+      const brand = (v.brand || "").trim();
       const matchesBrand = !selectedBrand || brand.toLowerCase() === selectedBrand.toLowerCase();
       const yearMatch = (v.year || "").match(/\d{4}/);
       const matchesYear = !selectedYear || (yearMatch && yearMatch[0] === selectedYear);
