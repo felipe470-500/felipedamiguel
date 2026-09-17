@@ -78,7 +78,18 @@ function MercadoLivrePage() {
   const connectMutation = useMutation({
     mutationFn: () => startOAuth({ data: {} } as never),
     onSuccess: (result: { url: string }) => {
-      window.location.href = result.url;
+      const opened = window.open(result.url, "_blank", "noopener,noreferrer");
+      if (!opened) {
+        try {
+          window.top!.location.href = result.url;
+        } catch {
+          window.location.href = result.url;
+        }
+      } else {
+        setFeedback(
+          "Abrimos o login do Mercado Livre em uma nova aba. Depois de autorizar, volte e atualize esta página.",
+        );
+      }
     },
     onError: (error: Error) => setFeedback(error.message),
   });
