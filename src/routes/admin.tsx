@@ -903,11 +903,18 @@ function VehicleRow({
       {uploadError && <p className="mt-2 text-xs text-destructive">{uploadError}</p>}
 
       <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
-        <Field label="Nome" value={vehicle.name} onChange={(val) => onChange({ name: val })} />
+        <div className="sm:col-span-2">
+          <span className="mb-1 block text-xs text-muted-foreground">Headline (gerada automaticamente após a consulta da placa)</span>
+          <div className="w-full rounded-md border border-border bg-muted px-2.5 py-2 text-sm text-foreground">
+            {vehicle.name || (
+              <span className="text-muted-foreground">Informe a placa e consulte para gerar a headline</span>
+            )}
+          </div>
+        </div>
         <Field label="Tag (opcional)" value={vehicle.tag ?? ""} onChange={(val) => onChange({ tag: val })} />
-        <Field label="Ano" value={vehicle.year} onChange={(val) => onChange({ year: val })} />
-        <Field label="KM" value={vehicle.km} onChange={(val) => onChange({ km: val })} />
-        <Field label="Preço" value={vehicle.price} onChange={(val) => onChange({ price: val })} />
+        <Field label="Ano" value={vehicle.year} onChange={(val) => onChange(regeneratePresentation({ year: val }))} />
+        <Field label="KM" value={vehicle.km} onChange={(val) => onChange(regeneratePresentation({ km: val }))} />
+        <Field label="Preço" value={vehicle.price} onChange={(val) => onChange(regeneratePresentation({ price: val }))} />
         <div className="sm:col-span-2">
           <span className="mb-1 block text-xs text-muted-foreground">Placa (apenas no admin)</span>
           <div className="flex gap-2">
