@@ -31,6 +31,7 @@ import {
   createVehicleUploadUrlFn,
 } from "@/lib/vehicles.functions";
 import { lookupVehicleByPlateFn } from "@/lib/plate-lookup.functions";
+import { readPlateFromImageFn } from "@/lib/plate-ocr.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 import {
