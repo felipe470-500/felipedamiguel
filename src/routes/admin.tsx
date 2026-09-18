@@ -999,6 +999,38 @@ function VehicleRow({
               {plateLoading ? "Consultando…" : "Consultar placa"}
             </button>
           </div>
+          {detecting && (
+            <p className="mt-1 text-xs text-muted-foreground">Lendo a placa nas fotos enviadas…</p>
+          )}
+          {detectedPlate && (
+            <div className="mt-2 flex flex-wrap items-center gap-2 rounded-md border border-primary/40 bg-primary/10 px-3 py-2 text-xs">
+              <span className="text-foreground">
+                Placa identificada na foto: <strong>{detectedPlate}</strong>. Confirmar?
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  const plate = detectedPlate;
+                  setDetectedPlate(null);
+                  onChange({ plate });
+                  void handlePlateLookup(plate);
+                }}
+                className="rounded bg-primary px-2.5 py-1 font-semibold text-primary-foreground hover:bg-primary/90"
+              >
+                Confirmar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  onChange({ plate: detectedPlate });
+                  setDetectedPlate(null);
+                }}
+                className="rounded border border-border px-2.5 py-1 font-semibold text-foreground hover:bg-secondary"
+              >
+                Editar
+              </button>
+            </div>
+          )}
           {plateMsg && (
             <p className={`mt-1 text-xs ${plateMsg.startsWith("✅") ? "text-primary" : "text-destructive"}`}>
               {plateMsg}
