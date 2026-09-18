@@ -618,6 +618,8 @@ function Editor({
                     onChange={(p) => update(v.id, p)}
                     onRemove={() => remove(v.id)}
                     uploadFile={uploadFile}
+                    onSave={persist}
+                    saving={saving}
                   />
                 ))}
 
