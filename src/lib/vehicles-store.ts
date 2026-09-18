@@ -29,6 +29,7 @@ export type Vehicle = {
 
 export const FUEL_OPTIONS = ["Flex", "Gasolina", "Etanol", "Diesel", "GNV", "Elétrico", "Híbrido"];
 export const TRANSMISSION_OPTIONS = ["Manual", "Automático", "Automatizado", "CVT"];
+export const DOORS_OPTIONS = [1, 2, 3, 4, 5, 6];
 export const BODY_OPTIONS = [
   "Hatch",
   "Sedã",
@@ -80,14 +81,8 @@ export const OPTIONAL_FEATURES_BY_CATEGORY: Record<OptionalFeatureCategory, stri
     "Chave presencial",
     "Partida por botão",
   ],
-  Condução: [
-    "Câmbio automático",
-    "Câmbio automatizado",
-    "Câmbio manual",
-    "4x4",
-    "Piloto automático",
-    "Volante multifuncional",
-  ],
+  // Câmbio NÃO entra aqui: a única fonte de verdade é o campo "Câmbio".
+  Condução: ["4x4", "Piloto automático", "Volante multifuncional"],
   Exterior: ["Rodas de liga leve", "Faróis de neblina", "Faróis em LED"],
 };
 

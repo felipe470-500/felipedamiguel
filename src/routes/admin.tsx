@@ -18,6 +18,7 @@ import {
   FUEL_OPTIONS,
   TRANSMISSION_OPTIONS,
   BODY_OPTIONS,
+  DOORS_OPTIONS,
   STATUS_OPTIONS,
   OPTIONAL_FEATURES_BY_CATEGORY,
   type OptionalFeatureCategory,
@@ -30,6 +31,7 @@ import {
   createVehicleUploadUrlFn,
 } from "@/lib/vehicles.functions";
 import { lookupVehicleByPlateFn } from "@/lib/plate-lookup.functions";
+import { readPlateFromImageFn } from "@/lib/plate-ocr.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 import {
@@ -616,6 +618,8 @@ function Editor({
                     onChange={(p) => update(v.id, p)}
                     onRemove={() => remove(v.id)}
                     uploadFile={uploadFile}
+                    onSave={persist}
+                    saving={saving}
                   />
                 ))}
 
@@ -653,11 +657,15 @@ function VehicleRow({
   onChange,
   onRemove,
   uploadFile,
+  onSave,
+  saving,
 }: {
   vehicle: Vehicle;
   onChange: (patch: Partial<Vehicle>) => void;
   onRemove: () => void;
   uploadFile: (file: File) => Promise<string>;
+  onSave: () => void;
+  saving: boolean;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -665,7 +673,10 @@ function VehicleRow({
   const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
   const [plateLoading, setPlateLoading] = useState(false);
   const [plateMsg, setPlateMsg] = useState("");
+  const [detectedPlate, setDetectedPlate] = useState<string | null>(null);
+  const [detecting, setDetecting] = useState(false);
   const lookupPlate = useServerFn(lookupVehicleByPlateFn);
+  const readPlateFromImage = useServerFn(readPlateFromImageFn);
 
   function regeneratePresentation(base: Partial<Vehicle>): Partial<Vehicle> {
     const merged = { ...vehicle, ...base };
@@ -694,8 +705,8 @@ function VehicleRow({
     };
   }
 
-  async function handlePlateLookup() {
-    const plate = (vehicle.plate ?? "").trim();
+  async function handlePlateLookup(override?: string) {
+    const plate = (override ?? vehicle.plate ?? "").trim();
     if (!plate) {
       setPlateMsg("Digite a placa primeiro.");
       return;
@@ -747,12 +758,36 @@ function VehicleRow({
     setUploadError("");
     try {
       const urls: string[] = [];
+      const imageFiles: File[] = [];
       for (const f of Array.from(files)) {
         if (!f.type.startsWith("image/") && !f.type.startsWith("video/")) continue;
+        if (f.type.startsWith("image/")) imageFiles.push(f);
         const url = await uploadFile(f);
         urls.push(url);
       }
       onChange({ images: [...vehicle.images, ...urls] });
+
+      // Leitura automática da placa (só sugere; nada é alterado sem confirmação).
+      if (!isValidPlate(vehicle.plate) && imageFiles.length > 0) {
+        setDetecting(true);
+        try {
+          for (const f of imageFiles.slice(0, 3)) {
+            const dataUrl = await fileToCompressedDataURL(f);
+            const res = await readPlateFromImage({
+              data: { password: getAdminPassword(), dataUrl },
+            });
+            if (res.plate && res.confidence >= 0.6) {
+              setDetectedPlate(res.plate);
+              setPlateMsg("");
+              break;
+            }
+          }
+        } catch {
+          /* leitura automática é opcional: o usuário pode digitar a placa */
+        } finally {
+          setDetecting(false);
+        }
+      }
     } catch (e) {
       setUploadError(`Falha ao enviar arquivo: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
@@ -813,6 +848,13 @@ function VehicleRow({
           <span className="text-xs">({vehicle.images.length} foto{vehicle.images.length === 1 ? "" : "s"})</span>
         </h3>
         <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={onSave}
+            disabled={saving}
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+          >
+            <Save className="h-3.5 w-3.5" /> {saving ? "Salvando…" : "Salvar"}
+          </button>
           <button
             onClick={() => {
               const linhas = [
@@ -949,7 +991,7 @@ function VehicleRow({
             />
             <button
               type="button"
-              onClick={handlePlateLookup}
+              onClick={() => void handlePlateLookup()}
               disabled={plateLoading}
               className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-secondary px-3 py-2 text-xs font-semibold text-foreground hover:bg-secondary/80 disabled:opacity-60"
             >
@@ -957,6 +999,38 @@ function VehicleRow({
               {plateLoading ? "Consultando…" : "Consultar placa"}
             </button>
           </div>
+          {detecting && (
+            <p className="mt-1 text-xs text-muted-foreground">Lendo a placa nas fotos enviadas…</p>
+          )}
+          {detectedPlate && (
+            <div className="mt-2 flex flex-wrap items-center gap-2 rounded-md border border-primary/40 bg-primary/10 px-3 py-2 text-xs">
+              <span className="text-foreground">
+                Placa identificada na foto: <strong>{detectedPlate}</strong>. Confirmar?
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  const plate = detectedPlate;
+                  setDetectedPlate(null);
+                  onChange({ plate });
+                  void handlePlateLookup(plate);
+                }}
+                className="rounded bg-primary px-2.5 py-1 font-semibold text-primary-foreground hover:bg-primary/90"
+              >
+                Confirmar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  onChange({ plate: detectedPlate });
+                  setDetectedPlate(null);
+                }}
+                className="rounded border border-border px-2.5 py-1 font-semibold text-foreground hover:bg-secondary"
+              >
+                Editar
+              </button>
+            </div>
+          )}
           {plateMsg && (
             <p className={`mt-1 text-xs ${plateMsg.startsWith("✅") ? "text-primary" : "text-destructive"}`}>
               {plateMsg}
@@ -1005,10 +1079,14 @@ function VehicleRow({
           options={BODY_OPTIONS}
           onChange={(val) => onChange({ bodyType: val || null })}
         />
-        <Field
-          label="Portas"
+        <SelectField
+          label="Quantidade de portas"
           value={vehicle.doors != null ? String(vehicle.doors) : ""}
-          onChange={(val) => onChange({ doors: val ? Number(val.replace(/\D/g, "")) : null })}
+          options={DOORS_OPTIONS.map((n) => String(n))}
+          labels={Object.fromEntries(
+            DOORS_OPTIONS.map((n) => [String(n), `${n} porta${n === 1 ? "" : "s"}`]),
+          )}
+          onChange={(val) => onChange({ doors: val ? Number(val) : null })}
         />
         <Field label="Chassi / VIN (opcional)" value={vehicle.vin ?? ""} onChange={(val) => onChange({ vin: val })} />
         <SelectField
