@@ -250,6 +250,53 @@ export type Database = {
         }
         Relationships: []
       }
+      plate_suggestions: {
+        Row: {
+          confidence: number
+          created_at: string
+          id: string
+          photo_index: number | null
+          photo_url: string | null
+          plate: string | null
+          resolved_at: string | null
+          scanned_at: string
+          status: string
+          vehicle_id: string
+        }
+        Insert: {
+          confidence?: number
+          created_at?: string
+          id?: string
+          photo_index?: number | null
+          photo_url?: string | null
+          plate?: string | null
+          resolved_at?: string | null
+          scanned_at?: string
+          status?: string
+          vehicle_id: string
+        }
+        Update: {
+          confidence?: number
+          created_at?: string
+          id?: string
+          photo_index?: number | null
+          photo_url?: string | null
+          plate?: string | null
+          resolved_at?: string | null
+          scanned_at?: string
+          status?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plate_suggestions_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       platforms: {
         Row: {
           active: boolean
