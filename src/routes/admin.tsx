@@ -705,8 +705,8 @@ function VehicleRow({
     };
   }
 
-  async function handlePlateLookup() {
-    const plate = (vehicle.plate ?? "").trim();
+  async function handlePlateLookup(override?: string) {
+    const plate = (override ?? vehicle.plate ?? "").trim();
     if (!plate) {
       setPlateMsg("Digite a placa primeiro.");
       return;
