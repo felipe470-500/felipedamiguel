@@ -507,6 +507,12 @@ function Editor({
                 </span>
               </div>
             )}
+            <Link
+              to="/revisar-placas"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs hover:bg-card"
+            >
+              <Search className="h-3.5 w-3.5" /> Revisar placas
+            </Link>
             <button
               onClick={onLogout}
               className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs hover:bg-card"
