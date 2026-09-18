@@ -450,6 +450,7 @@ function Landing() {
           <nav aria-label="Acessos da equipe" className="flex shrink-0 items-center gap-2">
             <Link
               to="/acesso"
+              aria-label="Integrador"
               className="inline-flex min-h-10 items-center gap-2 rounded-md border border-border bg-card px-3 text-xs font-semibold text-foreground transition-colors hover:border-primary hover:text-primary sm:text-sm"
             >
               <LayoutDashboard className="h-4 w-4" />
@@ -457,6 +458,7 @@ function Landing() {
             </Link>
             <Link
               to="/admin"
+              aria-label="Editor de vídeos"
               className="inline-flex min-h-10 items-center gap-2 rounded-md bg-foreground px-3 text-xs font-semibold text-background transition-colors hover:bg-primary sm:text-sm"
             >
               <Video className="h-4 w-4" />
