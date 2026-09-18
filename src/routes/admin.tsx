@@ -657,11 +657,15 @@ function VehicleRow({
   onChange,
   onRemove,
   uploadFile,
+  onSave,
+  saving,
 }: {
   vehicle: Vehicle;
   onChange: (patch: Partial<Vehicle>) => void;
   onRemove: () => void;
   uploadFile: (file: File) => Promise<string>;
+  onSave: () => void;
+  saving: boolean;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -669,7 +673,10 @@ function VehicleRow({
   const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
   const [plateLoading, setPlateLoading] = useState(false);
   const [plateMsg, setPlateMsg] = useState("");
+  const [detectedPlate, setDetectedPlate] = useState<string | null>(null);
+  const [detecting, setDetecting] = useState(false);
   const lookupPlate = useServerFn(lookupVehicleByPlateFn);
+  const readPlateFromImage = useServerFn(readPlateFromImageFn);
 
   function regeneratePresentation(base: Partial<Vehicle>): Partial<Vehicle> {
     const merged = { ...vehicle, ...base };
