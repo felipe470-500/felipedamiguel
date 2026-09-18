@@ -185,12 +185,20 @@ export const saveVehiclesFn = createServerFn({ method: "POST" })
       const existing = rows.filter((r) => "id" in r);
       const created = rows.filter((r) => !("id" in r));
 
+      // A fila de sincronização é preparada por gatilho DEPOIS da gravação do veículo,
+      // e falhas ali não desfazem o cadastro. Se ainda assim vier um erro de sync_jobs,
+      // a mensagem deixa claro que o veículo foi salvo.
+      const describe = (message: string) =>
+        message.includes("sync_jobs")
+          ? "O veículo foi salvo, mas houve um problema ao preparar a sincronização."
+          : message;
+
       if (existing.length > 0) {
         const { data: up, error: upErr } = await supabaseAdmin
           .from("vehicles")
           .upsert(existing, { onConflict: "id" })
           .select("id");
-        if (upErr) throw new Error(upErr.message);
+        if (upErr) throw new Error(describe(upErr.message));
         keepIds.push(...(up ?? []).map((r) => r.id));
       }
 
@@ -199,7 +207,7 @@ export const saveVehiclesFn = createServerFn({ method: "POST" })
           .from("vehicles")
           .insert(created)
           .select("id");
-        if (insErr) throw new Error(insErr.message);
+        if (insErr) throw new Error(describe(insErr.message));
         keepIds.push(...(ins ?? []).map((r) => r.id));
       }
     }
