@@ -81,14 +81,8 @@ export const OPTIONAL_FEATURES_BY_CATEGORY: Record<OptionalFeatureCategory, stri
     "Chave presencial",
     "Partida por botão",
   ],
-  Condução: [
-    "Câmbio automático",
-    "Câmbio automatizado",
-    "Câmbio manual",
-    "4x4",
-    "Piloto automático",
-    "Volante multifuncional",
-  ],
+  // Câmbio NÃO entra aqui: a única fonte de verdade é o campo "Câmbio".
+  Condução: ["4x4", "Piloto automático", "Volante multifuncional"],
   Exterior: ["Rodas de liga leve", "Faróis de neblina", "Faróis em LED"],
 };
 
