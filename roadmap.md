@@ -26,3 +26,4 @@
 
 
 
+- [x] Botão Salvar em cada veículo, câmbio sem duplicidade, portas 1 a 6 e leitura da placa pela foto com confirmação.
