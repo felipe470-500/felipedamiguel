@@ -1047,10 +1047,14 @@ function VehicleRow({
           options={BODY_OPTIONS}
           onChange={(val) => onChange({ bodyType: val || null })}
         />
-        <Field
-          label="Portas"
+        <SelectField
+          label="Quantidade de portas"
           value={vehicle.doors != null ? String(vehicle.doors) : ""}
-          onChange={(val) => onChange({ doors: val ? Number(val.replace(/\D/g, "")) : null })}
+          options={DOORS_OPTIONS.map((n) => String(n))}
+          labels={Object.fromEntries(
+            DOORS_OPTIONS.map((n) => [String(n), `${n} porta${n === 1 ? "" : "s"}`]),
+          )}
+          onChange={(val) => onChange({ doors: val ? Number(val) : null })}
         />
         <Field label="Chassi / VIN (opcional)" value={vehicle.vin ?? ""} onChange={(val) => onChange({ vin: val })} />
         <SelectField
