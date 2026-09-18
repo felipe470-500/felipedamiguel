@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, memo } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { MessageCircle, MapPin, ShieldCheck, CreditCard, Clock, Lock, Share2, PlayCircle, LayoutDashboard } from "lucide-react";
-import heroBg from "@/assets/hero-bg.jpg";
+import { MessageCircle, MapPin, ShieldCheck, CreditCard, FileCheck2, Lock, Share2, PlayCircle, LayoutDashboard, Video, CarFront, ArrowRight } from "lucide-react";
+import showroomAsset from "@/assets/showroom-miguel-veiculos.png.asset.json";
 import logo from "@/assets/logo.jpg";
 import { type Vehicle, isVideoUrl, mediaUrl } from "@/lib/vehicles-store";
 import { listVehiclesFn } from "@/lib/vehicles.functions";
@@ -68,6 +68,9 @@ export const Route = createFileRoute("/")({
         },
         { property: "og:type", content: "website" },
         { property: "og:url", content: "https://miguelveiculosfsa.com/" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: "Catálogo de carros novos e seminovos — Miguel Veículos" },
+        { name: "twitter:description", content: "Veja os veículos disponíveis e fale diretamente com a Miguel Veículos pelo WhatsApp." },
       ],
       links: [
         { rel: "canonical", href: "https://miguelveiculosfsa.com/" },
@@ -395,7 +398,7 @@ function Landing() {
   );
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <main className="storefront min-h-screen bg-background text-foreground">
       {vehicles.slice(0, 3).map((v) => {
         const cover = v.images[0];
         if (!cover) return null;
@@ -439,68 +442,85 @@ function Landing() {
       )}
 
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-2">
-            <img src={logo} alt="Miguel Veículos" className="h-10 w-auto rounded-lg object-contain" />
-          </div>
-          <Link
-            to="/acesso"
-            className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-medium text-foreground transition-colors hover:bg-accent sm:text-sm"
-          >
-            <LayoutDashboard className="h-4 w-4" />
-            <span className="hidden sm:inline">Área do Integrador</span>
-            <span className="sm:hidden">Integrador</span>
-          </Link>
+      <header className="sticky top-0 z-40 border-b border-border bg-background/95 shadow-sm backdrop-blur-md">
+        <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3">
+          <a href="#inicio" aria-label="Início — Miguel Veículos" className="min-w-0">
+            <img src={logo} alt="Miguel Veículos" className="h-10 w-auto object-contain sm:h-12" />
+          </a>
+          <nav aria-label="Acessos da equipe" className="flex shrink-0 items-center gap-2">
+            <Link
+              to="/acesso"
+              aria-label="Integrador"
+              className="inline-flex min-h-10 items-center gap-2 rounded-md border border-border bg-card px-3 text-xs font-semibold text-foreground transition-colors hover:border-primary hover:text-primary sm:text-sm"
+            >
+              <LayoutDashboard className="h-4 w-4" />
+              <span className="hidden sm:inline">Integrador</span>
+            </Link>
+            <Link
+              to="/admin"
+              aria-label="Editor de vídeos"
+              className="inline-flex min-h-10 items-center gap-2 rounded-md bg-foreground px-3 text-xs font-semibold text-background transition-colors hover:bg-primary sm:text-sm"
+            >
+              <Video className="h-4 w-4" />
+              <span className="hidden sm:inline">Editor de vídeos</span>
+              <span className="sm:hidden">Vídeos</span>
+            </Link>
+          </nav>
         </div>
       </header>
 
       {/* Hero */}
-      <section className="relative overflow-hidden">
+      <section id="inicio" className="relative min-h-[540px] overflow-hidden sm:min-h-[620px] lg:min-h-[660px]">
         <img
-          src={heroBg}
-          alt="Showroom de veículos"
-          width={1600}
-          height={1000}
-          className="absolute inset-0 h-full w-full object-cover opacity-50"
+          src={showroomAsset.url}
+          alt="Showroom da Miguel Veículos com veículos em exposição"
+          width={1448}
+          height={1086}
+          className="absolute inset-0 h-full w-full object-cover object-[50%_50%] sm:object-[50%_52%]"
         />
-        <div className="absolute inset-0" style={{ background: "var(--gradient-hero)" }} aria-hidden />
-        <div className="relative mx-auto max-w-5xl px-4 py-20 sm:py-28">
-          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-[11px] uppercase tracking-widest text-muted-foreground">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-            Mais de 30 anos realizando sonhos com transparência e confiança
-          </span>
-          <h1 className="mt-4 text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl">
-            Carros novos e seminovos em Formosa
-            <br />
-            <span className="bg-[image:var(--gradient-accent)] bg-clip-text text-transparent">
-              Miguel Veículos
-            </span>
-          </h1>
-
-          <p className="mt-4 max-w-xl text-base text-muted-foreground sm:text-lg">
-            Veículos novos e seminovos selecionados, aprovação rápida e condições especiais.
-            Fale direto com nossa equipe pelo WhatsApp e leve o seu hoje mesmo.
-          </p>
-
-          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+        <div className="absolute inset-0 bg-[image:var(--gradient-showroom)]" aria-hidden />
+        <div className="relative mx-auto flex min-h-[540px] max-w-6xl items-end px-4 pb-10 pt-28 sm:min-h-[620px] sm:pb-14 lg:min-h-[660px]">
+          <div className="max-w-xl text-showroom-foreground">
+            <p className="text-sm font-semibold uppercase text-showroom-muted">Bem-vindo à</p>
+            <h1 className="mt-2 text-4xl font-bold leading-[1.05] sm:text-6xl">Miguel Veículos</h1>
+            <p className="mt-4 max-w-lg text-sm leading-relaxed text-showroom-muted sm:text-base">
+              Qualidade, procedência e as melhores condições para você realizar o seu próximo negócio.
+            </p>
             <a
               href="#catalogo"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-base font-semibold text-primary-foreground shadow-[var(--shadow-card)] transition-transform active:scale-[0.98]"
+              className="mt-6 inline-flex min-h-14 items-center justify-center gap-3 rounded-md bg-primary px-6 text-base font-bold uppercase text-primary-foreground shadow-[var(--shadow-cta)] transition-all hover:bg-primary/90 active:scale-[0.98]"
             >
+              <CarFront className="h-6 w-6" />
               Ver catálogo
+              <ArrowRight className="h-5 w-5" />
             </a>
-          </div>
-
-          <div className="mt-8 grid grid-cols-3 gap-3 sm:max-w-md">
-            <Stat icon={<ShieldCheck className="h-4 w-4" />} label="Procedência garantida" />
-            <Stat icon={<CreditCard className="h-4 w-4" />} label="Financiamento facilitado" />
-            <Stat icon={<Clock className="h-4 w-4" />} label="Aprovação rápida" />
           </div>
         </div>
       </section>
+
+      <section aria-label="Condições e benefícios" className="border-b border-border bg-benefits">
+        <div className="mx-auto grid max-w-6xl gap-px bg-border px-4 py-6 sm:grid-cols-3 sm:gap-4 sm:bg-transparent sm:py-8">
+          <Benefit
+            icon={<ShieldCheck className="h-7 w-7" />}
+            title="Procedência e garantia"
+            description="Todos os nossos veículos passam por uma avaliação de procedência antes de serem disponibilizados para venda."
+            highlight="Garantia de 90 dias ou 3.000 km, conforme condições aplicáveis."
+          />
+          <Benefit
+            icon={<CreditCard className="h-7 w-7" />}
+            title="Financiamento facilitado"
+            description="Financiamento de veículos em até 60 meses."
+            highlight="Opção de pagamento no cartão de crédito em até 24 vezes."
+          />
+          <Benefit
+            icon={<FileCheck2 className="h-7 w-7" />}
+            title="Aprovação de crédito"
+            description="Enviamos seus dados para análise das instituições financeiras."
+          />
+        </div>
+      </section>
       {/* Catálogo */}
-      <section id="catalogo" className="mx-auto max-w-5xl px-4 py-16 sm:py-24">
+      <section id="catalogo" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-14 sm:py-20">
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-widest text-primary">Catálogo</p>
@@ -737,12 +757,26 @@ function Landing() {
   );
 }
 
-function Stat({ icon, label }: { icon: React.ReactNode; label: string }) {
+function Benefit({
+  icon,
+  title,
+  description,
+  highlight,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  highlight?: string;
+}) {
   return (
-    <div className="flex flex-col items-start gap-1.5 rounded-lg border border-border bg-card/60 p-3">
-      <span className="text-primary">{icon}</span>
-      <span className="text-[11px] leading-tight text-muted-foreground">{label}</span>
-    </div>
+    <article className="flex gap-4 bg-card p-5 sm:rounded-md sm:border sm:border-border sm:p-6 sm:shadow-[var(--shadow-card)]">
+      <span className="grid h-12 w-12 shrink-0 place-items-center rounded-md bg-primary-soft text-primary">{icon}</span>
+      <div className="min-w-0">
+        <h2 className="text-base font-bold uppercase text-foreground">{title}</h2>
+        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{description}</p>
+        {highlight && <p className="mt-2 text-sm font-bold text-primary">{highlight}</p>}
+      </div>
+    </article>
   );
 }
 
@@ -802,8 +836,7 @@ const VehicleCard = memo(function VehicleCard({
               alt={vehicle.name}
               loading="eager"
               decoding="async"
-              // @ts-ignore
-              fetchpriority="high"
+              fetchPriority="high"
               className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
               style={{ objectFit: "contain", width: "100%", height: "100%" }}
               onError={(e) => {
