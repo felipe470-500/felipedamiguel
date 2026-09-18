@@ -991,7 +991,7 @@ function VehicleRow({
             />
             <button
               type="button"
-              onClick={handlePlateLookup}
+              onClick={() => void handlePlateLookup()}
               disabled={plateLoading}
               className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-secondary px-3 py-2 text-xs font-semibold text-foreground hover:bg-secondary/80 disabled:opacity-60"
             >
