@@ -758,12 +758,36 @@ function VehicleRow({
     setUploadError("");
     try {
       const urls: string[] = [];
+      const imageFiles: File[] = [];
       for (const f of Array.from(files)) {
         if (!f.type.startsWith("image/") && !f.type.startsWith("video/")) continue;
+        if (f.type.startsWith("image/")) imageFiles.push(f);
         const url = await uploadFile(f);
         urls.push(url);
       }
       onChange({ images: [...vehicle.images, ...urls] });
+
+      // Leitura automática da placa (só sugere; nada é alterado sem confirmação).
+      if (!isValidPlate(vehicle.plate) && imageFiles.length > 0) {
+        setDetecting(true);
+        try {
+          for (const f of imageFiles.slice(0, 3)) {
+            const dataUrl = await fileToCompressedDataURL(f);
+            const res = await readPlateFromImage({
+              data: { password: getAdminPassword(), dataUrl },
+            });
+            if (res.plate && res.confidence >= 0.6) {
+              setDetectedPlate(res.plate);
+              setPlateMsg("");
+              break;
+            }
+          }
+        } catch {
+          /* leitura automática é opcional: o usuário pode digitar a placa */
+        } finally {
+          setDetecting(false);
+        }
+      }
     } catch (e) {
       setUploadError(`Falha ao enviar arquivo: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
