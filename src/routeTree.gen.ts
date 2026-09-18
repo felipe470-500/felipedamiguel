@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as RevisarPlacasRouteImport } from './routes/revisar-placas'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AcessoRouteImport } from './routes/acesso'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -25,6 +26,11 @@ import { Route as ApiPublicIntegrationsMercadolivreCallbackRouteImport } from '.
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RevisarPlacasRoute = RevisarPlacasRouteImport.update({
+  id: '/revisar-placas',
+  path: '/revisar-placas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -90,6 +96,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/acesso': typeof AcessoRoute
   '/admin': typeof AdminRoute
+  '/revisar-placas': typeof RevisarPlacasRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/configuracoes-loja': typeof AuthenticatedConfiguracoesLojaRoute
   '/integrador': typeof AuthenticatedIntegradorRoute
@@ -103,6 +110,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/acesso': typeof AcessoRoute
   '/admin': typeof AdminRoute
+  '/revisar-placas': typeof RevisarPlacasRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/configuracoes-loja': typeof AuthenticatedConfiguracoesLojaRoute
   '/integrador': typeof AuthenticatedIntegradorRoute
@@ -118,6 +126,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/acesso': typeof AcessoRoute
   '/admin': typeof AdminRoute
+  '/revisar-placas': typeof RevisarPlacasRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/configuracoes-loja': typeof AuthenticatedConfiguracoesLojaRoute
   '/_authenticated/integrador': typeof AuthenticatedIntegradorRoute
@@ -133,6 +142,7 @@ export interface FileRouteTypes {
     | '/'
     | '/acesso'
     | '/admin'
+    | '/revisar-placas'
     | '/sitemap.xml'
     | '/configuracoes-loja'
     | '/integrador'
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/'
     | '/acesso'
     | '/admin'
+    | '/revisar-placas'
     | '/sitemap.xml'
     | '/configuracoes-loja'
     | '/integrador'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/acesso'
     | '/admin'
+    | '/revisar-placas'
     | '/sitemap.xml'
     | '/_authenticated/configuracoes-loja'
     | '/_authenticated/integrador'
@@ -175,6 +187,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AcessoRoute: typeof AcessoRoute
   AdminRoute: typeof AdminRoute
+  RevisarPlacasRoute: typeof RevisarPlacasRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   FeedEstoqueDotjsonRoute: typeof FeedEstoqueDotjsonRoute
   ApiPublicVehicleImageRoute: typeof ApiPublicVehicleImageRoute
@@ -189,6 +202,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/revisar-placas': {
+      id: '/revisar-placas'
+      path: '/revisar-placas'
+      fullPath: '/revisar-placas'
+      preLoaderRoute: typeof RevisarPlacasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -292,6 +312,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AcessoRoute: AcessoRoute,
   AdminRoute: AdminRoute,
+  RevisarPlacasRoute: RevisarPlacasRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   FeedEstoqueDotjsonRoute: FeedEstoqueDotjsonRoute,
   ApiPublicVehicleImageRoute: ApiPublicVehicleImageRoute,
