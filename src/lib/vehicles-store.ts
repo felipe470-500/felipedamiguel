@@ -29,6 +29,7 @@ export type Vehicle = {
 
 export const FUEL_OPTIONS = ["Flex", "Gasolina", "Etanol", "Diesel", "GNV", "Elétrico", "Híbrido"];
 export const TRANSMISSION_OPTIONS = ["Manual", "Automático", "Automatizado", "CVT"];
+export const DOORS_OPTIONS = [1, 2, 3, 4, 5, 6];
 export const BODY_OPTIONS = [
   "Hatch",
   "Sedã",
