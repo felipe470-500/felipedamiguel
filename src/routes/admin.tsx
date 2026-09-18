@@ -849,6 +849,13 @@ function VehicleRow({
         </h3>
         <div className="flex flex-wrap items-center gap-2">
           <button
+            onClick={onSave}
+            disabled={saving}
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+          >
+            <Save className="h-3.5 w-3.5" /> {saving ? "Salvando…" : "Salvar"}
+          </button>
+          <button
             onClick={() => {
               const linhas = [
                 `🚗 *${vehicle.name || "Veículo"}*`,
