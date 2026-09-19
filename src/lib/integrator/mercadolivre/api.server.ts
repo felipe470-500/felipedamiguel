@@ -127,7 +127,7 @@ export async function refreshAccessToken(refreshToken: string): Promise<MlTokenS
   });
 }
 
-export type SupabaseAdmin = typeof import("@/integrations/supabase/client.server")["supabaseAdmin"];
+export type SupabaseAdmin = (typeof import("@/integrations/supabase/client.server"))["supabaseAdmin"];
 
 export async function saveTokens(
   supabaseAdmin: SupabaseAdmin,
@@ -216,12 +216,19 @@ export async function mlFetch<T>(
     status: response.status,
     body: parsed as T,
     errorMessage:
-      errorBody?.message ?? errorBody?.error ?? `Erro ${response.status} do Mercado Livre`,
+      errorBody?.message ??
+      (Array.isArray((errorBody as { cause?: unknown } | null)?.cause) &&
+      (errorBody as { cause: unknown[] }).cause.length > 0
+        ? `${errorBody?.error ?? "Erro"}: ${(errorBody as { cause: Array<{ message?: string; code?: string }> }).cause.map((c) => c?.message ?? c?.code ?? JSON.stringify(c)).join("; ")}`
+        : errorBody?.error) ??
+      `Erro ${response.status} do Mercado Livre`,
     ...(retryAfter ? { retryAfterSeconds: Number(retryAfter) } : {}),
   };
 }
 
-export function categorizeMlError(status: number):
+export function categorizeMlError(
+  status: number,
+):
   | "VALIDATION"
   | "AUTHENTICATION"
   | "AUTHORIZATION"
