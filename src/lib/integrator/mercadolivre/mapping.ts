@@ -15,6 +15,8 @@ export type MlAttribute = { id: string; value_name: string };
 
 export type MlItemPayload = {
   title: string;
+  name?: string;
+  family_name?: string;
   category_id: string;
   price: number;
   currency_id: "BRL";
@@ -129,6 +131,8 @@ export function buildItemPayload(
 
   return {
     title: buildTitle(vehicle, options.fallbackName),
+    name: "Lara",
+    family_name: "Miguel Veículos",
     category_id: options.categoryId ?? ML_CARS_CATEGORY,
     price: Math.round((vehicle.priceCents ?? 0) / 100),
     currency_id: "BRL",
@@ -163,6 +167,8 @@ export function buildUpdatePayload(
   const full = buildItemPayload(vehicle, contact, options);
   return {
     title: full.title,
+    name: full.name,
+    family_name: full.family_name,
     price: full.price,
     pictures: full.pictures,
     location: full.location,
