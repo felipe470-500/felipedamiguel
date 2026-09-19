@@ -131,7 +131,6 @@ export function buildItemPayload(
 
   return {
     title: buildTitle(vehicle, options.fallbackName),
-    name: "Lara",
     family_name: "Miguel Veículos",
     category_id: options.categoryId ?? ML_CARS_CATEGORY,
     price: Math.round((vehicle.priceCents ?? 0) / 100),
@@ -167,7 +166,6 @@ export function buildUpdatePayload(
   const full = buildItemPayload(vehicle, contact, options);
   return {
     title: full.title,
-    name: full.name,
     family_name: full.family_name,
     price: full.price,
     pictures: full.pictures,
