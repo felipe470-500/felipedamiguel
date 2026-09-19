@@ -27,7 +27,7 @@ export type MlItemPayload = {
     state: { id: string };
     country: { id: "BR" };
   };
-  seller_contact: { country_code2: string; phone2: string };
+  seller_contact: { country_code2: string; phone2: string; name?: string; family_name?: string };
   attributes: MlAttribute[];
 };
 
@@ -83,8 +83,9 @@ export function contactFromStoreProfile(store: StoreProfileData | null): MlStore
 }
 
 export function buildTitle(vehicle: CanonicalVehicle, fallbackName: string): string {
-  const parts = [vehicle.brand, vehicle.model, vehicle.version, vehicle.doors ? `${vehicle.doors}P` : null]
-    .filter((part): part is string => Boolean(part && String(part).trim()));
+  const parts = [vehicle.brand, vehicle.model, vehicle.version, vehicle.doors ? `${vehicle.doors}P` : null].filter(
+    (part): part is string => Boolean(part && String(part).trim()),
+  );
   const base = parts.length >= 2 ? parts.join(" ") : fallbackName;
   const year = vehicle.modelYear ?? vehicle.manufactureYear;
   const title = year && !base.includes(String(year)) ? `${base} ${year}` : base;
@@ -140,7 +141,12 @@ export function buildItemPayload(
       state: { id: contact.stateId },
       country: { id: "BR" },
     },
-    seller_contact: { country_code2: contact.countryCode, phone2: contact.whatsapp },
+    seller_contact: {
+      country_code2: contact.countryCode,
+      phone2: contact.whatsapp,
+      name: "Lara",
+      family_name: "Miguel Veículos",
+    },
     attributes: attributes.filter((attribute) => attribute.value_name.trim().length > 0),
   };
 }
@@ -168,9 +174,7 @@ export function buildUpdatePayload(
 /** Descrição é enviada em chamada separada, sem telefone/site/endereço no corpo. */
 export function buildDescriptionText(vehicle: CanonicalVehicle, fallbackName: string): string {
   const base = vehicle.description?.trim() || fallbackName;
-  const optionals = vehicle.optionalFeatures?.length
-    ? `\n\nOpcionais: ${vehicle.optionalFeatures.join(", ")}`
-    : "";
+  const optionals = vehicle.optionalFeatures?.length ? `\n\nOpcionais: ${vehicle.optionalFeatures.join(", ")}` : "";
   return `${base}${optionals}`
     .replace(/\b\d{2}\s?\d{4,5}-?\d{4}\b/g, "")
     .replace(/https?:\/\/\S+/gi, "")
