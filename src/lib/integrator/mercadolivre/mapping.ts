@@ -34,11 +34,11 @@ export type MlItemPayload = {
 };
 
 const FUEL_MAP: Record<string, string> = {
-  flex: "Flex",
+  flex: "Gasolina e álcool",
   gasolina: "Gasolina",
   etanol: "Etanol",
   diesel: "Diesel",
-  gnv: "GNV",
+  gnv: "Gasolina e gás natural",
   eletrico: "Elétrico",
   hibrido: "Híbrido",
 };
@@ -47,23 +47,29 @@ const TRANSMISSION_MAP: Record<string, string> = {
   manual: "Manual",
   automatico: "Automática",
   automatica: "Automática",
-  automatizado: "Automatizada",
-  cvt: "CVT",
+  automatizado: "Semiautomática",
+  cvt: "Automática CVT",
 };
 
 const BODY_MAP: Record<string, string> = {
-  hatch: "Hatchback",
-  hatchback: "Hatchback",
-  sedan: "Sedán",
+  hatch: "Hatch",
+  hatchback: "Hatch",
+  sedan: "Sedã",
   suv: "SUV",
   picape: "Pick-Up",
   pickup: "Pick-Up",
-  perua: "Station Wagon",
+  perua: "Perua",
   minivan: "Minivan",
   van: "Van",
   conversivel: "Conversível",
   cupe: "Coupé",
   coupe: "Coupé",
+  furgao: "Furgão",
+  caminhaoleve: "Caminhão leve",
+  monovolume: "Monovolume",
+  offroad: "Off-Road",
+  roadster: "Roadster",
+  crossover: "Crossover",
 };
 
 function normalizeKey(value: string | null): string {
@@ -121,7 +127,10 @@ export function buildItemPayload(
     });
   }
   if (vehicle.bodyType) {
-    attributes.push({ id: "BODYWORK", value_name: BODY_MAP[normalizeKey(vehicle.bodyType)] ?? vehicle.bodyType });
+    attributes.push({
+      id: "VEHICLE_BODY_TYPE",
+      value_name: BODY_MAP[normalizeKey(vehicle.bodyType)] ?? vehicle.bodyType,
+    });
   }
   if (vehicle.color) attributes.push({ id: "COLOR", value_name: vehicle.color });
   if (vehicle.plate) attributes.push({ id: "LICENSE_PLATE", value_name: vehicle.plate.toUpperCase() });
