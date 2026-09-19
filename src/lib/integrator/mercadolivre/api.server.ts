@@ -215,13 +215,15 @@ export async function mlFetch<T>(
     ok: false,
     status: response.status,
     body: parsed as T,
-    errorMessage:
-      errorBody?.message ??
-      (Array.isArray((errorBody as { cause?: unknown } | null)?.cause) &&
-      (errorBody as { cause: unknown[] }).cause.length > 0
-        ? `${errorBody?.error ?? "Erro"}: ${(errorBody as { cause: Array<{ message?: string; code?: string }> }).cause.map((c) => c?.message ?? c?.code ?? JSON.stringify(c)).join("; ")}`
-        : errorBody?.error) ??
-      `Erro ${response.status} do Mercado Livre`,
+    errorMessage: (() => {
+      const causeArr = Array.isArray((errorBody as { cause?: unknown } | null)?.cause)
+        ? (errorBody as { cause: Array<{ message?: string; code?: string }> }).cause
+        : [];
+      const causeText =
+        causeArr.length > 0 ? causeArr.map((c) => c?.message ?? c?.code ?? JSON.stringify(c)).join("; ") : "";
+      const base = errorBody?.message ?? errorBody?.error ?? `Erro ${response.status} do Mercado Livre`;
+      return causeText ? `${base}: ${causeText}` : base;
+    })(),
     ...(retryAfter ? { retryAfterSeconds: Number(retryAfter) } : {}),
   };
 }
