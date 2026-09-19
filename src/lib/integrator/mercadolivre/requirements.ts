@@ -42,7 +42,11 @@ export const MERCADOLIVRE_REQUIREMENTS: readonly Requirement[] = [
     label: "WhatsApp da loja (com DDD)",
     scope: "store",
     hint: "Configurações da loja",
-    check: ({ store }) => /^\d{10,11}$/.test(digits(store?.whatsapp ?? store?.phone ?? null)),
+    check: ({ store }) => {
+      const d = digits(store?.whatsapp ?? store?.phone ?? null);
+      const n = d.length > 11 && d.startsWith("55") ? d.slice(2) : d;
+      return /^\d{10,11}$/.test(n);
+    },
   },
   {
     key: "store.city",
