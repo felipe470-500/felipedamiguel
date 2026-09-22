@@ -33,15 +33,30 @@ export type MlItemPayload = {
   attributes: MlAttribute[];
 };
 
+/** Valores aceitos pela categoria MLB1744 (consultados na API de atributos). */
 const FUEL_MAP: Record<string, string> = {
   flex: "Gasolina e álcool",
+  "flex fuel": "Gasolina e álcool",
+  "gasolina e alcool": "Gasolina e álcool",
+  "alcool/gasolina": "Gasolina e álcool",
+  "gasolina/alcool": "Gasolina e álcool",
+  bicombustivel: "Gasolina e álcool",
   gasolina: "Gasolina",
+  alcool: "Álcool",
   etanol: "Etanol",
   diesel: "Diesel",
+  "diesel s10": "Diesel",
   gnv: "Gasolina e gás natural",
+  "gasolina/gnv": "Gasolina e gás natural",
+  "flex/gnv": "Gasolina-Álcool e gás natural",
   eletrico: "Elétrico",
   hibrido: "Híbrido",
+  "hibrido flex": "Híbrido/Flex",
+  "hibrido gasolina": "Híbrido/Gasolina",
+  "hibrido diesel": "Híbrido/Diesel",
 };
+
+const FUEL_VALUES = new Set(Object.values(FUEL_MAP));
 
 const TRANSMISSION_MAP: Record<string, string> = {
   manual: "Manual",
