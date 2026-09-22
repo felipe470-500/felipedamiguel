@@ -133,7 +133,9 @@ export function buildItemPayload(
     attributes.push({ id: "KILOMETERS", value_name: `${vehicle.mileageKm} km` });
   }
   if (vehicle.fuel) {
-    attributes.push({ id: "FUEL_TYPE", value_name: FUEL_MAP[normalizeKey(vehicle.fuel)] ?? vehicle.fuel });
+    const mapped = FUEL_MAP[normalizeKey(vehicle.fuel)] ?? vehicle.fuel.trim();
+    // A categoria só aceita valores da lista oficial; enviar texto livre faz o ML descartar o atributo.
+    if (FUEL_VALUES.has(mapped)) attributes.push({ id: "FUEL_TYPE", value_name: mapped });
   }
   if (vehicle.transmission) {
     attributes.push({
