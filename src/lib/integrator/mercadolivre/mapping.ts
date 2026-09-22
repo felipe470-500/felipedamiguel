@@ -33,15 +33,30 @@ export type MlItemPayload = {
   attributes: MlAttribute[];
 };
 
+/** Valores aceitos pela categoria MLB1744 (consultados na API de atributos). */
 const FUEL_MAP: Record<string, string> = {
   flex: "Gasolina e álcool",
+  "flex fuel": "Gasolina e álcool",
+  "gasolina e alcool": "Gasolina e álcool",
+  "alcool/gasolina": "Gasolina e álcool",
+  "gasolina/alcool": "Gasolina e álcool",
+  bicombustivel: "Gasolina e álcool",
   gasolina: "Gasolina",
+  alcool: "Álcool",
   etanol: "Etanol",
   diesel: "Diesel",
+  "diesel s10": "Diesel",
   gnv: "Gasolina e gás natural",
+  "gasolina/gnv": "Gasolina e gás natural",
+  "flex/gnv": "Gasolina-Álcool e gás natural",
   eletrico: "Elétrico",
   hibrido: "Híbrido",
+  "hibrido flex": "Híbrido/Flex",
+  "hibrido gasolina": "Híbrido/Gasolina",
+  "hibrido diesel": "Híbrido/Diesel",
 };
+
+const FUEL_VALUES = new Set(Object.values(FUEL_MAP));
 
 const TRANSMISSION_MAP: Record<string, string> = {
   manual: "Manual",
@@ -118,7 +133,9 @@ export function buildItemPayload(
     attributes.push({ id: "KILOMETERS", value_name: `${vehicle.mileageKm} km` });
   }
   if (vehicle.fuel) {
-    attributes.push({ id: "FUEL_TYPE", value_name: FUEL_MAP[normalizeKey(vehicle.fuel)] ?? vehicle.fuel });
+    const mapped = FUEL_MAP[normalizeKey(vehicle.fuel)] ?? vehicle.fuel.trim();
+    // A categoria só aceita valores da lista oficial; enviar texto livre faz o ML descartar o atributo.
+    if (FUEL_VALUES.has(mapped)) attributes.push({ id: "FUEL_TYPE", value_name: mapped });
   }
   if (vehicle.transmission) {
     attributes.push({

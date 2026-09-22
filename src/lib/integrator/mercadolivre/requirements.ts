@@ -32,6 +32,24 @@ export const MERCADOLIVRE_REQUIREMENTS: readonly Requirement[] = [
     check: ({ vehicle }) => typeof vehicle.mileageKm === "number" && vehicle.mileageKm >= 0,
   },
   {
+    key: "version",
+    label: "Versão do veículo (atributo TRIM)",
+    scope: "vehicle",
+    check: ({ vehicle }) => hasText(vehicle.version),
+  },
+  {
+    key: "fuel",
+    label: "Combustível (atributo FUEL_TYPE)",
+    scope: "vehicle",
+    check: ({ vehicle }) => hasText(vehicle.fuel),
+  },
+  {
+    key: "doors",
+    label: "Quantidade de portas (atributo DOORS)",
+    scope: "vehicle",
+    check: ({ vehicle }) => typeof vehicle.doors === "number" && vehicle.doors > 0,
+  },
+  {
     key: "photos",
     label: "Pelo menos 1 foto",
     scope: "vehicle",
