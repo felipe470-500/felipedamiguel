@@ -212,6 +212,9 @@ export function extractEngine(version: string | null | undefined): string | null
 
 /** Monta a headline comercial: Marca + Modelo + Motorização + Ano/Modelo + Cor. */
 export function generateVehicleHeadline(vehicle: Partial<Vehicle>): string {
+  // Sem marca e modelo estruturados não há headline confiável: mantém o nome atual
+  // (evita reescrever títulos antigos como apenas "2021").
+  if (!vehicle.brand?.trim() || !vehicle.model?.trim()) return vehicle.name || "";
   const engine = extractEngine(vehicle.version);
   const year = vehicle.modelYear ? String(vehicle.modelYear) : vehicle.year;
   const parts = [
