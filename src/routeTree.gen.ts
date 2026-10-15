@@ -9,33 +9,27 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as RevisarPlacasRouteImport } from './routes/revisar-placas'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AcessoRouteImport } from './routes/acesso'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as FeedEstoqueDotjsonRouteImport } from './routes/feed/estoque[.]json'
-import { Route as AuthenticatedIntegradorRouteImport } from './routes/_authenticated/integrador'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AcessoRouteImport } from './routes/acesso'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as RevisarPlacasRouteImport } from './routes/revisar-placas'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthenticatedConfiguracoesLojaRouteImport } from './routes/_authenticated/configuracoes-loja'
-import { Route as ApiPublicVehicleImageRouteImport } from './routes/api/public/vehicle-image'
+import { Route as AuthenticatedIntegradorRouteImport } from './routes/_authenticated/integrador'
+import { Route as FeedEstoqueDotjsonRouteImport } from './routes/feed/estoque[.]json'
 import { Route as AuthenticatedIntegracoesMercadoLivreRouteImport } from './routes/_authenticated/integracoes/mercado-livre'
-import { Route as ApiPublicIntegrationsMercadolivreNotificationsRouteImport } from './routes/api/public/integrations/mercadolivre/notifications'
+import { Route as ApiPublicVehicleImageRouteImport } from './routes/api/public/vehicle-image'
 import { Route as ApiPublicIntegrationsMercadolivreCallbackRouteImport } from './routes/api/public/integrations/mercadolivre/callback'
+import { Route as ApiPublicIntegrationsMercadolivreNotificationsRouteImport } from './routes/api/public/integrations/mercadolivre/notifications'
 
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RevisarPlacasRoute = RevisarPlacasRouteImport.update({
-  id: '/revisar-placas',
-  path: '/revisar-placas',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AcessoRoute = AcessoRouteImport.update({
@@ -43,24 +37,20 @@ const AcessoRoute = AcessoRouteImport.update({
   path: '/acesso',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const RevisarPlacasRoute = RevisarPlacasRouteImport.update({
+  id: '/revisar-placas',
+  path: '/revisar-placas',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FeedEstoqueDotjsonRoute = FeedEstoqueDotjsonRouteImport.update({
-  id: '/feed/estoque.json',
-  path: '/feed/estoque.json',
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedIntegradorRoute = AuthenticatedIntegradorRouteImport.update({
-  id: '/integrador',
-  path: '/integrador',
-  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedConfiguracoesLojaRoute =
   AuthenticatedConfiguracoesLojaRouteImport.update({
@@ -68,9 +58,14 @@ const AuthenticatedConfiguracoesLojaRoute =
     path: '/configuracoes-loja',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const ApiPublicVehicleImageRoute = ApiPublicVehicleImageRouteImport.update({
-  id: '/api/public/vehicle-image',
-  path: '/api/public/vehicle-image',
+const AuthenticatedIntegradorRoute = AuthenticatedIntegradorRouteImport.update({
+  id: '/integrador',
+  path: '/integrador',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const FeedEstoqueDotjsonRoute = FeedEstoqueDotjsonRouteImport.update({
+  id: '/feed/estoque.json',
+  path: '/feed/estoque.json',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedIntegracoesMercadoLivreRoute =
@@ -79,16 +74,21 @@ const AuthenticatedIntegracoesMercadoLivreRoute =
     path: '/integracoes/mercado-livre',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const ApiPublicIntegrationsMercadolivreNotificationsRoute =
-  ApiPublicIntegrationsMercadolivreNotificationsRouteImport.update({
-    id: '/api/public/integrations/mercadolivre/notifications',
-    path: '/api/public/integrations/mercadolivre/notifications',
-    getParentRoute: () => rootRouteImport,
-  } as any)
+const ApiPublicVehicleImageRoute = ApiPublicVehicleImageRouteImport.update({
+  id: '/api/public/vehicle-image',
+  path: '/api/public/vehicle-image',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicIntegrationsMercadolivreCallbackRoute =
   ApiPublicIntegrationsMercadolivreCallbackRouteImport.update({
     id: '/api/public/integrations/mercadolivre/callback',
     path: '/api/public/integrations/mercadolivre/callback',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicIntegrationsMercadolivreNotificationsRoute =
+  ApiPublicIntegrationsMercadolivreNotificationsRouteImport.update({
+    id: '/api/public/integrations/mercadolivre/notifications',
+    path: '/api/public/integrations/mercadolivre/notifications',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -197,32 +197,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/revisar-placas': {
-      id: '/revisar-placas'
-      path: '/revisar-placas'
-      fullPath: '/revisar-placas'
-      preLoaderRoute: typeof RevisarPlacasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/acesso': {
-      id: '/acesso'
-      path: '/acesso'
-      fullPath: '/acesso'
-      preLoaderRoute: typeof AcessoRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -232,26 +211,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/acesso': {
+      id: '/acesso'
+      path: '/acesso'
+      fullPath: '/acesso'
+      preLoaderRoute: typeof AcessoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/feed/estoque.json': {
-      id: '/feed/estoque.json'
-      path: '/feed/estoque.json'
-      fullPath: '/feed/estoque.json'
-      preLoaderRoute: typeof FeedEstoqueDotjsonRouteImport
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/integrador': {
-      id: '/_authenticated/integrador'
-      path: '/integrador'
-      fullPath: '/integrador'
-      preLoaderRoute: typeof AuthenticatedIntegradorRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/revisar-placas': {
+      id: '/revisar-placas'
+      path: '/revisar-placas'
+      fullPath: '/revisar-placas'
+      preLoaderRoute: typeof RevisarPlacasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/configuracoes-loja': {
       id: '/_authenticated/configuracoes-loja'
@@ -260,11 +246,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConfiguracoesLojaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/api/public/vehicle-image': {
-      id: '/api/public/vehicle-image'
-      path: '/api/public/vehicle-image'
-      fullPath: '/api/public/vehicle-image'
-      preLoaderRoute: typeof ApiPublicVehicleImageRouteImport
+    '/_authenticated/integrador': {
+      id: '/_authenticated/integrador'
+      path: '/integrador'
+      fullPath: '/integrador'
+      preLoaderRoute: typeof AuthenticatedIntegradorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/feed/estoque.json': {
+      id: '/feed/estoque.json'
+      path: '/feed/estoque.json'
+      fullPath: '/feed/estoque.json'
+      preLoaderRoute: typeof FeedEstoqueDotjsonRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/integracoes/mercado-livre': {
@@ -274,11 +267,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIntegracoesMercadoLivreRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/api/public/integrations/mercadolivre/notifications': {
-      id: '/api/public/integrations/mercadolivre/notifications'
-      path: '/api/public/integrations/mercadolivre/notifications'
-      fullPath: '/api/public/integrations/mercadolivre/notifications'
-      preLoaderRoute: typeof ApiPublicIntegrationsMercadolivreNotificationsRouteImport
+    '/api/public/vehicle-image': {
+      id: '/api/public/vehicle-image'
+      path: '/api/public/vehicle-image'
+      fullPath: '/api/public/vehicle-image'
+      preLoaderRoute: typeof ApiPublicVehicleImageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/integrations/mercadolivre/callback': {
@@ -286,6 +279,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/integrations/mercadolivre/callback'
       fullPath: '/api/public/integrations/mercadolivre/callback'
       preLoaderRoute: typeof ApiPublicIntegrationsMercadolivreCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/integrations/mercadolivre/notifications': {
+      id: '/api/public/integrations/mercadolivre/notifications'
+      path: '/api/public/integrations/mercadolivre/notifications'
+      fullPath: '/api/public/integrations/mercadolivre/notifications'
+      preLoaderRoute: typeof ApiPublicIntegrationsMercadolivreNotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
