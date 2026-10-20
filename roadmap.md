@@ -29,3 +29,4 @@
 - [x] Botão Salvar em cada veículo, câmbio sem duplicidade, portas 1 a 6 e leitura da placa pela foto com confirmação.
 - [x] Leitura automática de placas nas fotos do estoque atual, com fila "Revisar placas identificadas" (confirmar/editar/descartar).
 - [x] Modernizar visualmente a página da loja com showroom claro, benefícios comerciais e acessos visíveis ao Integrador e Editor de vídeos.
+- [x] Corrigir extração da motorização em versões com letra colada (1.6A, 1.4AT, 1.0M) e limpar os 8 nomes com "1" solto.
