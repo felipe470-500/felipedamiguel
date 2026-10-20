@@ -30,3 +30,4 @@
 - [x] Leitura automática de placas nas fotos do estoque atual, com fila "Revisar placas identificadas" (confirmar/editar/descartar).
 - [x] Modernizar visualmente a página da loja com showroom claro, benefícios comerciais e acessos visíveis ao Integrador e Editor de vídeos.
 - [x] Corrigir extração da motorização em versões com letra colada (1.6A, 1.4AT, 1.0M) e limpar os 8 nomes com "1" solto.
+- [x] Conferir a planilha de migração enviada e identificar se há campo para imagens (modelo contém 25 colunas, sem campo de fotos).
