@@ -206,8 +206,10 @@ export function isValidPlate(plate: string | null | undefined): boolean {
 /** Extrai motorização da versão (ex: "1.0 Turbo" → "1.0", "2.0" → "2.0"). */
 export function extractEngine(version: string | null | undefined): string | null {
   if (!version) return null;
-  const match = version.match(/\b\d(?:\.\d{1,2})?\b/);
-  return match ? match[0] : null;
+  // Versões como "1.4AT LTZ", "1.0M 1.0 M" ou "1.6A COMF" trazem a motorização colada
+  // na letra da caixa: o sufixo alfanumérico não pode funcionar como limite da captura.
+  const match = version.match(/\b([1-9]\.\d{1,2}|[1-9](?![\w.]))/);
+  return match ? match[1] : null;
 }
 
 /** Monta a headline comercial: Marca + Modelo + Motorização + Ano/Modelo + Cor. */
