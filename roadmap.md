@@ -31,3 +31,4 @@
 - [x] Modernizar visualmente a página da loja com showroom claro, benefícios comerciais e acessos visíveis ao Integrador e Editor de vídeos.
 - [x] Corrigir extração da motorização em versões com letra colada (1.6A, 1.4AT, 1.0M) e limpar os 8 nomes com "1" solto.
 - [x] Conferir a planilha de migração enviada e identificar se há campo para imagens (modelo contém 25 colunas, sem campo de fotos).
+- [x] Gerar XLSX de migração Auto Car com 61 veículos consignados, identificação original preservada e links de mídia nas observações; valores de entrada ausentes mantidos em branco e Em Estoque = Não.
