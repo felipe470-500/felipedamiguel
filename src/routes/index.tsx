@@ -1,7 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, memo } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { MessageCircle, MapPin, ShieldCheck, CreditCard, FileCheck2, Lock, Share2, PlayCircle, LayoutDashboard, Video, CarFront, ArrowRight } from "lucide-react";
+import {
+  MessageCircle,
+  MapPin,
+  ShieldCheck,
+  CreditCard,
+  FileCheck2,
+  Lock,
+  Share2,
+  PlayCircle,
+  LayoutDashboard,
+  Video,
+  CarFront,
+  ArrowRight,
+} from "lucide-react";
 import showroomAsset from "@/assets/showroom-miguel-veiculos.png.asset.json";
 import logo from "@/assets/logo.jpg";
 import { type Vehicle, isVideoUrl, mediaUrl } from "@/lib/vehicles-store";
@@ -12,14 +25,46 @@ import { ImageViewer } from "@/components/vehicle-viewer/ImageViewer";
 import { MediaImg, MediaVideo } from "@/components/vehicle-viewer/MediaFallback";
 import { buildVehicleShareUrl } from "@/lib/canonical-url";
 import { trackWhatsAppClick, trackEvent, type TrackingParams } from "@/lib/analytics";
+import { STORE_WHATSAPP } from "@/lib/sellers";
 
 /** Marcas conhecidas usadas só como fallback para anúncios antigos sem marca estruturada. */
 const KNOWN_BRANDS = [
-  "Fiat", "Volkswagen", "Chevrolet", "Ford", "Toyota", "Honda", "Hyundai",
-  "Renault", "Nissan", "Jeep", "Mitsubishi", "Peugeot", "Citroën", "Citroen",
-  "Kia", "BMW", "Mercedes-Benz", "Mercedes", "Audi", "Volvo", "Land Rover",
-  "Caoa Chery", "Chery", "BYD", "GWM", "RAM", "Suzuki", "Subaru", "JAC",
-  "Changan", "Lifan", "SsangYong", "Troller", "Effa", "Iveco", "Agrale",
+  "Fiat",
+  "Volkswagen",
+  "Chevrolet",
+  "Ford",
+  "Toyota",
+  "Honda",
+  "Hyundai",
+  "Renault",
+  "Nissan",
+  "Jeep",
+  "Mitsubishi",
+  "Peugeot",
+  "Citroën",
+  "Citroen",
+  "Kia",
+  "BMW",
+  "Mercedes-Benz",
+  "Mercedes",
+  "Audi",
+  "Volvo",
+  "Land Rover",
+  "Caoa Chery",
+  "Chery",
+  "BYD",
+  "GWM",
+  "RAM",
+  "Suzuki",
+  "Subaru",
+  "JAC",
+  "Changan",
+  "Lifan",
+  "SsangYong",
+  "Troller",
+  "Effa",
+  "Iveco",
+  "Agrale",
 ];
 
 const FALLBACK_IMAGE =
@@ -70,12 +115,12 @@ export const Route = createFileRoute("/")({
         { property: "og:url", content: "https://miguelveiculosfsa.com/" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: "Catálogo de carros novos e seminovos — Miguel Veículos" },
-        { name: "twitter:description", content: "Veja os veículos disponíveis e fale diretamente com a Miguel Veículos pelo WhatsApp." },
+        {
+          name: "twitter:description",
+          content: "Veja os veículos disponíveis e fale diretamente com a Miguel Veículos pelo WhatsApp.",
+        },
       ],
-      links: [
-        { rel: "canonical", href: "https://miguelveiculosfsa.com/" },
-        ...(preloadLinks as any[]),
-      ],
+      links: [{ rel: "canonical", href: "https://miguelveiculosfsa.com/" }, ...(preloadLinks as any[])],
       scripts: [
         {
           type: "application/ld+json",
@@ -116,7 +161,7 @@ function Landing() {
   const [gateRequired, setGateRequired] = useState(false);
   const [gatePassed, setGatePassed] = useState(true);
   const [detailVehicle, setDetailVehicle] = useState<Vehicle | null>(null);
- 
+
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedBrand, setSelectedBrand] = useState("");
@@ -209,7 +254,6 @@ function Landing() {
     }
   }, [vehicles]);
 
-
   useEffect(() => {
     let alive = true;
     getSettings()
@@ -225,16 +269,25 @@ function Landing() {
       alive = false;
     };
   }, [getSettings]);
- 
+
   function openWhatsApp(source: string, message?: string, extraParams?: TrackingParams) {
     trackWhatsAppClick({ source, ...extraParams });
-    trackEvent("Lead", { source, ...extraParams });
     const text = message ?? "Olá! Gostaria de falar sobre os veículos disponíveis na Miguel Veículos.";
-    const url = `https://wa.me/556182106951?text=${encodeURIComponent(text)}`;
-    const win = window.open(url, "_blank", "noopener,noreferrer");
-    if (!win) window.location.href = url;
+    const url = `https://wa.me/${STORE_WHATSAPP}?text=${encodeURIComponent(text)}`;
+    // Abre o WhatsApp UMA única vez, em nova aba. Não usar "noopener" nas features do
+    // window.open: com ele o navegador sempre devolve null e a página atual também era redirecionada.
+    const win = window.open(url, "_blank");
+    if (win) {
+      try {
+        win.opener = null;
+      } catch {
+        /* ignora */
+      }
+    } else {
+      // Pop-up bloqueado (ex.: navegador interno de apps): único caminho até o WhatsApp.
+      window.location.href = url;
+    }
   }
-
 
   useEffect(() => {
     if (typeof window === "undefined" || loading) return;
@@ -304,7 +357,6 @@ function Landing() {
     }
   }
 
- 
   const parsePrice = (p: string | null | undefined) => {
     if (!p) return 0;
     const num = parseFloat(p.replace(/\D/g, ""));
@@ -323,10 +375,7 @@ function Landing() {
   };
 
   const brands = useMemo(
-    () =>
-      Array.from(
-        new Set(vehicles.map((v) => brandOf(v)).filter((b) => b && b.length > 1)),
-      ).sort(),
+    () => Array.from(new Set(vehicles.map((v) => brandOf(v)).filter((b) => b && b.length > 1))).sort(),
     [vehicles],
   );
 
@@ -392,24 +441,14 @@ function Landing() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [filteredVehicles.length]);
 
-  const displayedVehicles = useMemo(
-    () => filteredVehicles.slice(0, visibleCount),
-    [filteredVehicles, visibleCount]
-  );
+  const displayedVehicles = useMemo(() => filteredVehicles.slice(0, visibleCount), [filteredVehicles, visibleCount]);
 
   return (
     <main className="storefront min-h-screen bg-background text-foreground">
       {vehicles.slice(0, 3).map((v) => {
         const cover = v.images[0];
         if (!cover) return null;
-        return (
-          <link
-            key={v.id}
-            rel="preload"
-            as="image"
-            href={mediaUrl(cover)}
-          />
-        );
+        return <link key={v.id} rel="preload" as="image" href={mediaUrl(cover)} />;
       })}
       {gateRequired && !gatePassed && <LeadGate onDone={() => setGatePassed(true)} />}
 
@@ -431,13 +470,13 @@ function Landing() {
               "detail_dialog",
               `Olá! Tenho interesse no ${detailVehicle.name} (${detailVehicle.year}) — ${detailVehicle.price}.`,
               {
+                vehicle_id: detailVehicle.id,
                 vehicle_name: detailVehicle.name,
                 vehicle_year: detailVehicle.year,
                 vehicle_price: detailVehicle.price,
-              }
+              },
             )
           }
-
         />
       )}
 
@@ -524,21 +563,24 @@ function Landing() {
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-widest text-primary">Catálogo</p>
-            <h2 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
-              Veículos em destaque
-            </h2>
+            <h2 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">Veículos em destaque</h2>
           </div>
           <p className="hidden text-sm text-muted-foreground sm:block">
             Toque em um modelo e fale direto com nossa equipe no WhatsApp
           </p>
         </div>
- 
+
         {/* Painel de Filtros */}
         {!loading && vehicles.length > 0 && (
           <div className="mb-8 grid grid-cols-1 gap-4 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)] sm:grid-cols-4">
             {/* Busca */}
             <div className="flex flex-col gap-1">
-              <label htmlFor="filtro-busca" className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Busca</label>
+              <label
+                htmlFor="filtro-busca"
+                className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
+              >
+                Busca
+              </label>
               <input
                 id="filtro-busca"
                 type="text"
@@ -548,10 +590,15 @@ function Landing() {
                 className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring text-foreground"
               />
             </div>
-            
+
             {/* Marca */}
             <div className="flex flex-col gap-1">
-              <label htmlFor="filtro-marca" className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Marca</label>
+              <label
+                htmlFor="filtro-marca"
+                className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
+              >
+                Marca
+              </label>
               <select
                 id="filtro-marca"
                 value={selectedBrand}
@@ -566,10 +613,15 @@ function Landing() {
                 ))}
               </select>
             </div>
- 
+
             {/* Ano */}
             <div className="flex flex-col gap-1">
-              <label htmlFor="filtro-ano" className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Ano</label>
+              <label
+                htmlFor="filtro-ano"
+                className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
+              >
+                Ano
+              </label>
               <select
                 id="filtro-ano"
                 value={selectedYear}
@@ -584,10 +636,15 @@ function Landing() {
                 ))}
               </select>
             </div>
- 
+
             {/* Preço */}
             <div className="flex flex-col gap-1">
-              <label htmlFor="filtro-preco" className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Preço máximo</label>
+              <label
+                htmlFor="filtro-preco"
+                className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
+              >
+                Preço máximo
+              </label>
               <div className="relative">
                 <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
                   R$
@@ -608,7 +665,6 @@ function Landing() {
               </div>
             </div>
 
-            
             {/* Limpar Filtros */}
             {(search || selectedBrand || selectedYear || maxPrice !== "") && (
               <div className="sm:col-span-4 flex justify-end">
@@ -627,7 +683,7 @@ function Landing() {
             )}
           </div>
         )}
- 
+
         {loading && vehicles.length === 0 ? (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }).map((_, i) => (
@@ -637,8 +693,8 @@ function Landing() {
         ) : vehicles.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border bg-card/40 px-6 py-12 text-center">
             <p className="text-sm text-muted-foreground">
-              Nenhum veículo cadastrado ainda. Em breve novidades — fale com nossa equipe no
-              WhatsApp para opções sob medida.
+              Nenhum veículo cadastrado ainda. Em breve novidades — fale com nossa equipe no WhatsApp para opções sob
+              medida.
             </p>
             <button
               onClick={() => openWhatsApp("empty_catalog", undefined, { vehicle_name: "Catálogo vazio" })}
@@ -647,13 +703,10 @@ function Landing() {
               <MessageCircle className="h-4 w-4" />
               Falar com nossa equipe
             </button>
-
           </div>
         ) : filteredVehicles.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border bg-card/40 px-6 py-12 text-center">
-            <p className="text-sm text-muted-foreground">
-              Nenhum veículo corresponde aos filtros selecionados.
-            </p>
+            <p className="text-sm text-muted-foreground">Nenhum veículo corresponde aos filtros selecionados.</p>
             <button
               onClick={() => {
                 setSearch("");
@@ -676,6 +729,7 @@ function Landing() {
                   onClick={() => openDetail(v)}
                   onContact={() =>
                     openWhatsApp("vehicle_card", `Olá! Tenho interesse no ${v.name} (${v.year}) — ${v.price}.`, {
+                      vehicle_id: v.id,
                       vehicle_name: v.name,
                       vehicle_year: v.year,
                       vehicle_price: v.price,
@@ -703,12 +757,10 @@ function Landing() {
       {/* CTA final */}
       <section className="border-t border-border bg-card/40">
         <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:py-20">
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-            Não encontrou o que procura?
-          </h2>
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Não encontrou o que procura?</h2>
           <p className="mt-3 text-muted-foreground">
-            Fale com nossa equipe no WhatsApp e encontramos o veículo ideal pra você — com o melhor
-            preço e condições sob medida.
+            Fale com nossa equipe no WhatsApp e encontramos o veículo ideal pra você — com o melhor preço e condições
+            sob medida.
           </p>
           <button
             onClick={() => openWhatsApp("cta_final", undefined, { vehicle_name: "Contato geral" })}
@@ -717,7 +769,6 @@ function Landing() {
             <MessageCircle className="h-5 w-5" />
             Falar com a equipe Miguel Veículos
           </button>
-
         </div>
       </section>
 
@@ -805,16 +856,16 @@ const VehicleCard = memo(function VehicleCard({
   onClick: () => void;
   onContact: () => void;
 }) {
-  const images = vehicle.images.length > 0 ? vehicle.images : ["data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'/>"];
+  const images =
+    vehicle.images.length > 0
+      ? vehicle.images
+      : ["data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'/>"];
   const coverImage = images[0];
 
   return (
     <article className="group overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-card)] transition-transform hover:-translate-y-1">
       {/* Container da Foto de Capa (Padrão OLX - Clicar abre a galeria completa) */}
-      <div
-        onClick={onClick}
-        className="relative aspect-[16/10] overflow-hidden bg-[#101318] cursor-pointer"
-      >
+      <div onClick={onClick} className="relative aspect-[16/10] overflow-hidden bg-[#101318] cursor-pointer">
         {isVideoUrl(coverImage) ? (
           <div className="relative flex h-full w-full items-center justify-center bg-muted">
             <MediaVideo
@@ -891,9 +942,11 @@ const VehicleCard = memo(function VehicleCard({
               if (typeof window === "undefined") return;
               const shareUrl = buildVehicleShareUrl(vehicle.id);
               const text = `Confira este veículo na Miguel Veículos: *${vehicle.name}* (${vehicle.year}) - *${vehicle.price}*. Veja mais fotos e detalhes direto no link: ${shareUrl}`;
-              
-              trackEvent("Contact", {
+
+              // Compartilhar não é contato com a loja: evento próprio, fora das conversões.
+              trackEvent("share_vehicle_whatsapp", {
                 source: "share_card_whatsapp",
+                vehicle_id: vehicle.id,
                 vehicle_name: vehicle.name,
                 vehicle_year: vehicle.year,
                 vehicle_price: vehicle.price,
@@ -914,18 +967,3 @@ const VehicleCard = memo(function VehicleCard({
     </article>
   );
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
