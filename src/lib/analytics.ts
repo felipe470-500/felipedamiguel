@@ -1,5 +1,9 @@
 export const META_PIXEL_ID = "296429546487036";
-export const GOOGLE_TAG_ID = "G-XXXXXXXXXX";
+// IDs do Google: preencha SOMENTE com os IDs reais da conta (nunca valores de exemplo).
+// Enquanto estiverem vazios, nenhum script do Google é carregado no site.
+export const GOOGLE_TAG_ID = ""; // Google Analytics 4 — começa com "G-"
+export const GOOGLE_ADS_ID = ""; // Google Ads — começa com "AW-"
+export const GOOGLE_ADS_WHATSAPP_LABEL = ""; // rótulo da conversão "Clique no WhatsApp" criada no Google Ads
 
 const AM_KEY = "fdm_am";
 
@@ -91,19 +95,20 @@ export function initAnalytics() {
     w.fbq("track", "PageView");
   }
 
-  // 2. Google Analytics (GA4)
-  if (!(window as any).gtag) {
+  // 2. Google tag (GA4 e/ou Google Ads): só carrega quando houver ID real configurado
+  const googleIds = [GOOGLE_TAG_ID, GOOGLE_ADS_ID].filter((id) => id.trim() !== "");
+  if (googleIds.length > 0 && !(window as any).gtag) {
     const script = document.createElement("script");
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${GOOGLE_TAG_ID}`;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${googleIds[0]}`;
     script.async = true;
     document.head.appendChild(script);
 
     (window as any).dataLayer = (window as any).dataLayer || [];
-    (window as any).gtag = function() {
+    (window as any).gtag = function () {
       (window as any).dataLayer.push(arguments);
     };
-    (window as any).gtag('js', new Date());
-    (window as any).gtag('config', GOOGLE_TAG_ID);
+    (window as any).gtag("js", new Date());
+    googleIds.forEach((id) => (window as any).gtag("config", id));
   }
 }
 
@@ -123,7 +128,7 @@ const standardEvents = new Set([
   "Purchase",
   "CompleteRegistration",
   "Contact",
-  "Search"
+  "Search",
 ]);
 
 export function trackEvent(event: string, params: TrackingParams) {
@@ -152,6 +157,40 @@ export function trackEvent(event: string, params: TrackingParams) {
   }
 }
 
+/**
+ * Clique em qualquer botão de WhatsApp da loja. Gera UM único evento por plataforma:
+ *  - Meta Pixel: "Contact"
+ *  - Google Analytics 4: "whatsapp_click" (somente se GOOGLE_TAG_ID estiver preenchido)
+ *  - Google Ads: conversão (somente se GOOGLE_ADS_ID e GOOGLE_ADS_WHATSAPP_LABEL estiverem preenchidos)
+ * Parâmetros: source (origem do clique) e, quando houver, vehicle_id, vehicle_name, vehicle_year, vehicle_price.
+ */
 export function trackWhatsAppClick(params: TrackingParams) {
-  trackEvent("Contact", params);
+  if (typeof window === "undefined") return;
+
+  initAnalytics();
+
+  const clean: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== "") clean[key] = value;
+  }
+
+  const fbq = (window as any).fbq;
+  if (typeof fbq === "function") {
+    const metaParams =
+      clean.vehicle_name && !clean.content_name ? { ...clean, content_name: clean.vehicle_name } : clean;
+    fbq("track", "Contact", metaParams);
+  }
+
+  const gtag = (window as any).gtag;
+  if (typeof gtag === "function") {
+    if (GOOGLE_TAG_ID) {
+      gtag("event", "whatsapp_click", { ...clean, send_to: GOOGLE_TAG_ID, transport_type: "beacon" });
+    }
+    if (GOOGLE_ADS_ID && GOOGLE_ADS_WHATSAPP_LABEL) {
+      gtag("event", "conversion", {
+        send_to: `${GOOGLE_ADS_ID}/${GOOGLE_ADS_WHATSAPP_LABEL}`,
+        transport_type: "beacon",
+      });
+    }
+  }
 }
