@@ -952,9 +952,19 @@ const VehicleCard = memo(function VehicleCard({
                 vehicle_price: vehicle.price,
               });
 
-              setTimeout(() => {
-                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
-              }, 300);
+              // Compartilhar para qualquer contato (sem número fixo), pelo domínio wa.me.
+              // Abre imediatamente no clique (sem atraso) para o navegador não bloquear a nova aba.
+              const shareWhatsAppUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+              const shareWin = window.open(shareWhatsAppUrl, "_blank");
+              if (shareWin) {
+                try {
+                  shareWin.opener = null;
+                } catch {
+                  /* ignora */
+                }
+              } else {
+                window.location.href = shareWhatsAppUrl;
+              }
             }}
 
             title="Compartilhar veículo no WhatsApp"
