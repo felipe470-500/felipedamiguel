@@ -13,6 +13,9 @@ export const SELLERS: Seller[] = [
   { id: "anderson", name: "Anderson Miguel", phone: "5561999021887" },
 ];
 
+/** WhatsApp oficial da loja: +55 61 98210-6951 (formato internacional, apenas dígitos). */
+export const STORE_WHATSAPP = "5561982106951";
+
 export function whatsappLink(phone: string, message?: string): string {
   const base = `https://wa.me/${phone}`;
   return message ? `${base}?text=${encodeURIComponent(message)}` : base;
